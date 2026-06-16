@@ -1,0 +1,44 @@
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: gastrohub-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: gastrohub
+      MYSQL_USER: gastrohub
+      MYSQL_PASSWORD: gastrohub123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - gastrohub-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  gastrohub-app:
+    build: .
+    container_name: gastrohub-api
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://mysql-db:3306/gastrohub?createDatabaseIfNotExist=true&useTimezone=true&serverTimezone=UTC
+      DB_USERNAME: gastrohub
+      DB_PASSWORD: gastrohub123
+      DB_DRIVER: com.mysql.cj.jdbc.Driver
+      DB_DIALECT: org.hibernate.dialect.MySQLDialect
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+    networks:
+      - gastrohub-net
+
+networks:
+  gastrohub-net:
+    driver: bridge
+
+volumes:
+  mysql_data:

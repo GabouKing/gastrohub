@@ -123,12 +123,48 @@ Os endpoints abaixo representam a cobertura esperada para a fase 2:
 
 ## Docker
 
-O enunciado exige um `docker-compose.yml` para subir aplicação e banco de dados. Quando o arquivo for adicionado, ele deve permitir:
+O enunciado exige um `docker-compose.yml` para subir aplicação e banco de dados. O projeto inclui:
 
-- subir a API Java;
-- subir o banco de dados;
-- conectar os serviços por rede interna;
-- facilitar a execução da solução por avaliadores.
+- `Dockerfile` — build multi-estágio (Maven → JRE Alpine)
+- `docker-compose.yml` — orquestração da API + MySQL Alpine
+- `.dockerignore` — otimização do contexto de build
+
+### Pré-requisitos
+
+- Docker Engine 24+
+- Docker Compose 2.20+
+
+### Execução com Docker
+
+```bash
+# Build da imagem da aplicação
+docker compose build
+
+# Subir todos os serviços
+docker compose up -d
+
+# Acompanhar logs
+docker compose logs -f gastrohub-api
+
+# Verificar containers em execução
+docker compose ps
+
+# Parar e remover tudo (inclusive volumes)
+docker compose down -v
+```
+
+### Acessos
+
+| Serviço | URL |
+|---|---|
+| API | http://localhost:8080 |
+| MySQL | localhost:3306, user `gastrohub`, pass `gastrohub123` |
+
+### Estrutura do docker-compose
+
+- `mysql-db`: MySQL 8.0 com volume persistente (`mysql_data`) e healthcheck
+- `gastrohub-app`: Aplicação Spring Boot, depende do MySQL estar saudável
+- Rede interna `gastrohub-net` isolando os serviços
 
 ## Testes
 
