@@ -5,12 +5,10 @@ target/
 .npmrc
 
 ### Maven Wrapper ###
-mvnw
 mvnw.cmd
-.mvn/
 
 ### Configuração Maven local ###
-settings.xml
+
 
 ### STS ###
 .apt_generated
