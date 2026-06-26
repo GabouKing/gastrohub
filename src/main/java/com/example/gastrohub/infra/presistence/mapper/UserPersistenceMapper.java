@@ -13,7 +13,7 @@ public class UserPersistenceMapper {
                 user.getEmail(),
                 user.getLogin(),
                 user.getPassword(),
-                user.getRoleId()
+                user.getRole()
         );
     }
 
@@ -24,7 +24,7 @@ public class UserPersistenceMapper {
                 entity.getEmail(),
                 entity.getLogin(),
                 entity.getPassword(),
-                entity.getRoleId()
+                entity.getRole()
         );
     }
 }

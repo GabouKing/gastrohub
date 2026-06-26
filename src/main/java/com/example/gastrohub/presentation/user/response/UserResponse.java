@@ -1,5 +1,6 @@
 package com.example.gastrohub.presentation.user.response;
 
+import com.example.gastrohub.domain.user.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,5 +11,5 @@ public class UserResponse {
     private String name;
     private String email;
     private String login;
-    private Long roleId;
+    private Integer role;
 }

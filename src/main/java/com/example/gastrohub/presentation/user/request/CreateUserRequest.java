@@ -1,5 +1,6 @@
 package com.example.gastrohub.presentation.user.request;
 
+import com.example.gastrohub.domain.user.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,5 +15,5 @@ public class CreateUserRequest {
     private String email;
     private String login;
     private String password;
-    private Long roleId;
+    private UserRole role;
 }

@@ -1,5 +1,6 @@
 package com.example.gastrohub.application.user.dto.user;
 
+import com.example.gastrohub.domain.user.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,5 +11,5 @@ public class CreateUserInput {
     private String email;
     private String login;
     private String password;
-    private Long roleId;
+    private UserRole role;
 }

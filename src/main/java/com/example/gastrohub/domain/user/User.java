@@ -11,10 +11,9 @@ public class User {
     private String email;
     private String login;
     private String password;
-    private Long roleId;
+    private UserRole role;
 
     public void changeEmail(String email) {
-        // validacoes de negocio
         this.email = email;
     }
 }

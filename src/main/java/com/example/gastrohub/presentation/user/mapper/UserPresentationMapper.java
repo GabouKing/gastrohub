@@ -17,7 +17,7 @@ public class UserPresentationMapper {
                 request.getEmail(),
                 request.getLogin(),
                 request.getPassword(),
-                request.getRoleId()
+                request.getRole()
         );
     }
 
@@ -28,7 +28,7 @@ public class UserPresentationMapper {
                 request.getEmail(),
                 request.getLogin(),
                 request.getPassword(),
-                request.getRoleId()
+                request.getRole()
         );
     }
 
@@ -38,7 +38,7 @@ public class UserPresentationMapper {
                 output.getName(),
                 output.getEmail(),
                 output.getLogin(),
-                output.getRoleId()
+                output.getRole()
         );
     }
 }

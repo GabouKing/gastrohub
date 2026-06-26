@@ -16,7 +16,7 @@ public class UserApplicationMapper {
                 input.getEmail(),
                 input.getLogin(),
                 input.getPassword(),
-                input.getRoleId()
+                input.getRole()
         );
     }
 
@@ -27,7 +27,7 @@ public class UserApplicationMapper {
                 input.getEmail(),
                 input.getLogin(),
                 input.getPassword(),
-                input.getRoleId()
+                input.getRole()
         );
     }
 
@@ -37,7 +37,7 @@ public class UserApplicationMapper {
                 user.getName(),
                 user.getEmail(),
                 user.getLogin(),
-                user.getRoleId()
+                user.getRole().ordinal()
         );
     }
 }
