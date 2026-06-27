@@ -1,5 +1,7 @@
 package com.example.gastrohub.presentation.exception;
 
+import com.example.gastrohub.domain.menuitem.exception.MenuItemNotFound;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
 import com.example.gastrohub.domain.user.exception.EmailAlreadyExistsException;
 import com.example.gastrohub.domain.user.exception.UserNotFound;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,11 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.net.URI;
+import java.util.HashMap;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,6 +35,36 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(MenuItemNotFound.class)
+    public ResponseEntity<ProblemDetail> handleMenuItemNotFound(
+            MenuItemNotFound exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.NOT_FOUND,
+                "Menu item not found",
+                "The requested menu item was not found.",
+                "/problems/menu-item-not-found",
+                request,
+                exception.getMenuItemId()
+        );
+    }
+
+    @ExceptionHandler(RestaurantNotFound.class)
+    public ResponseEntity<ProblemDetail> handleRestaurantNotFound(
+            RestaurantNotFound exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.NOT_FOUND,
+                "Restaurant not found",
+                "The requested restaurant was not found.",
+                "/problems/restaurant-not-found",
+                request,
+                exception.getRestaurantId()
+        );
+    }
+
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ProblemDetail> handleEmailAlreadyExists(
             EmailAlreadyExistsException exception,
@@ -44,6 +78,27 @@ public class GlobalExceptionHandler {
                 request,
                 exception.getEmail()
         );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ProblemDetail> handleValidationError(
+            MethodArgumentNotValidException exception,
+            HttpServletRequest request
+    ) {
+        var errors = new HashMap<String, String>();
+        exception.getBindingResult().getFieldErrors()
+                .forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+
+        var body = ProblemDetail.forStatusAndDetail(
+                HttpStatus.BAD_REQUEST,
+                "One or more request fields are invalid"
+        );
+        body.setType(URI.create("/problems/validation-error"));
+        body.setTitle("Validation error");
+        body.setInstance(URI.create(request.getRequestURI()));
+        body.setProperty("errors", errors);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler({
