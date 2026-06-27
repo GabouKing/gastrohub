@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -29,8 +31,12 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping
-    public ResponseEntity<UserResponse> updateUser(@RequestBody UpdateUserRequest updateUserRequest) {
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> updateUser(
+            @PathVariable Long id,
+            @RequestBody UpdateUserRequest updateUserRequest
+    ) {
+        updateUserRequest.setId(id);
         var input = UserPresentationMapper.toInput(updateUserRequest);
         var output = updateUserUseCase.execute(input);
         var response = UserPresentationMapper.toResponse(output);
@@ -38,9 +44,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<?> allUsers() {
-        return ResponseEntity.status(HttpStatus.OK).body(listUserUseCase.execute());
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> allUsers() {
+        var response = listUserUseCase.execute()
+                .stream()
+                .map(UserPresentationMapper::toResponse)
+                .toList();
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/{id}")
