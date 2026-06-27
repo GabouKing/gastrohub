@@ -14,7 +14,7 @@ public class FindUserByIdUseCase {
 
     public UserOutput execute(Long id) {
         var user = userGateway.findById(id)
-                .orElseThrow(() -> new UserNotFound("User not found by id: " + id));
+                .orElseThrow(() -> new UserNotFound(id));
 
         return UserApplicationMapper.toOutput(user);
     }

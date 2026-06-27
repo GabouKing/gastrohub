@@ -15,13 +15,14 @@ public class UpdateUserUseCase {
     public UpdateUserUseCase(UserGateway userGateway) { this.userGateway = userGateway; }
 
     public UserOutput execute(UpdateUserInput input) {
-        if (userGateway.findById(input.getId()) == null) {
-            throw new UserNotFound("User not found UserId: "+input.getId());
-        }
+        userGateway.findById(input.getId())
+                .orElseThrow(() -> new UserNotFound(input.getId()));
 
-        else if (userGateway.findByEmail(input.getEmail()).isPresent()) {
-            throw new EmailAlreadyExistsException("Email Already Exists");
-        }
+        userGateway.findByEmail(input.getEmail())
+                .filter(user -> !user.getId().equals(input.getId()))
+                .ifPresent(user -> {
+                    throw new EmailAlreadyExistsException(input.getEmail());
+                });
 
         var userToUpload = UserApplicationMapper.toDomain(input);
         var userUpdated = userGateway.save(userToUpload);
