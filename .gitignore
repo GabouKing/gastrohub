@@ -1,8 +1,14 @@
 HELP.md
 target/
-.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+.npmrc
+
+### Maven Wrapper ###
+mvnw.cmd
+
+### Configuração Maven local ###
+
 
 ### STS ###
 .apt_generated

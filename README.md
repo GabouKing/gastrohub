@@ -1,57 +1,127 @@
 # GastroHub
 
-GastroHub é a base de um sistema de gestão compartilhado para restaurantes, desenvolvido para o Tech Challenge da fase 2. O objetivo do projeto é permitir o cadastro e a administração de tipos de usuário, restaurantes e itens de cardápio, seguindo uma organização em camadas e boas práticas de desenvolvimento com Spring Boot.
+GastroHub é um sistema de gestão compartilhado para restaurantes, desenvolvido para o **Tech Challenge da Fase 2** da pós-graduação. O sistema permite cadastro de tipos de usuário, usuários, restaurantes e itens de cardápio, seguindo uma arquitetura em camadas e boas práticas de desenvolvimento com Spring Boot.
 
-## Visão geral
+> Projeto acadêmico — a implementação dos CRUDs, controllers e testes será feita pelos colegas em etapas futuras.
 
-Nesta fase, o sistema atende aos requisitos de:
+---
 
-- cadastro e associação de tipos de usuário;
-- cadastro completo de restaurantes;
-- cadastro de itens do cardápio;
-- documentação da API;
-- uso de Docker Compose para execução integrada;
-- testes automatizados;
-- organização em camadas inspirada em Clean Architecture.
+## Stack
 
-O projeto está estruturado para evoluir de forma incremental, permitindo a implementação das funcionalidades exigidas pela fase sem comprometer a manutenibilidade.
+| Tecnologia | Versão |
+|---|---|
+| Java | 21 |
+| Spring Boot | 4.1.0 |
+| Spring Data JPA / Hibernate | 7.4 |
+| Spring Web MVC | — |
+| Lombok | — |
+| Maven | 3.9+ |
+| H2 Database | dev (embedded) |
+| MySQL 8.0 | produção / Docker |
+| Docker | 24+ |
 
-## Requisitos da fase 2
-
-Conforme o enunciado do Tech Challenge, o sistema deve contemplar:
-
-- `Tipo de usuário`: cadastro de perfis como `Dono de Restaurante` e `Cliente`, com associação aos usuários existentes;
-- `Restaurante`: cadastro com nome, endereço, tipo de cozinha, horário de funcionamento e dono associado;
-- `Item de cardápio`: cadastro com nome, descrição, preço, disponibilidade para consumo apenas no local e caminho da foto;
-- documentação técnica do projeto;
-- coleção de testes para Postman ou ferramenta similar;
-- `docker-compose.yml` para subir aplicação e banco;
-- testes unitários e de integração.
-
-## Stack utilizada
-
-- Java 21
-- Spring Boot 4.1.0
-- Spring Web MVC
-- Spring Data JPA
-- H2 Database
-- Lombok
-- Maven
+---
 
 ## Estrutura do projeto
 
-O projeto segue uma divisão por camadas:
+```
+src/main/java/com/example/gastrohub/
+├── GastrohubApplication.java         # Entry point Spring Boot
+├── domain/
+│   └── entity/
+│       ├── UserType.java             # Tipo de usuário
+│       ├── User.java                 # Usuário
+│       ├── Restaurant.java           # Restaurante
+│       └── MenuItem.java             # Item do cardápio
+├── application/                      # (a implementar — casos de uso)
+├── infrastructure/                   # (a implementar — persistência)
+└── presentation/                     # (a implementar — controllers REST)
 
-- `domain`: entidades, exceções e contratos de repositório;
-- `application`: casos de uso, DTOs e mapeadores;
-- `infra`: configurações, persistência e integrações técnicas;
-- `presentation`: controladores da API.
+src/main/resources/
+├── application.properties            # Configuração da aplicação
+└── db/
+    └── migration/
+        └── V1__init.sql              # Script DDL MySQL (referência)
 
-Essa separação facilita a evolução do código, reduz acoplamento e mantém as regras de negócio isoladas da infraestrutura.
+src/test/java/com/example/gastrohub/
+└── GastrohubApplicationTests.java    # Smoke test
+```
 
-## Estado atual
+---
 
-O repositório já possui a base do projeto Spring Boot e a estrutura de pacotes preparada para receber a implementação das regras de negócio. Neste momento, a aplicação está no ponto inicial do domínio, então os endpoints, repositórios concretos, persistência e coleções de teste devem ser adicionados conforme a evolução da fase.
+## Banco de dados
+
+### Modelo relacional
+
+```
+user_types (1) ──── (N) users (1) ──── (N) restaurants (1) ──── (N) menu_items
+```
+
+As tabelas são geradas automaticamente pelo Hibernate via `spring.jpa.hibernate.ddl-auto=update`
+— **nenhum script manual é necessário** para criar o schema.
+
+### user_types
+
+Armazena os perfis de usuário do sistema (ex.: "Dono de Restaurante", "Cliente").
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT | Identificador único |
+| name | VARCHAR(100) | NOT NULL, UNIQUE | Nome do tipo |
+| created_at | DATETIME(6) | NOT NULL | Data de criação |
+| updated_at | DATETIME(6) | NOT NULL | Data da última atualização |
+
+### users
+
+Armazena os usuários do sistema, cada um associado a um tipo.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT | Identificador único |
+| name | VARCHAR(150) | NOT NULL | Nome completo |
+| email | VARCHAR(200) | NOT NULL, UNIQUE | E-mail (login) |
+| password | VARCHAR(255) | NOT NULL | Hash da senha |
+| phone | VARCHAR(20) | — | Telefone de contato |
+| user_type_id | BIGINT | FK → user_types(id), NOT NULL | Tipo de usuário |
+| created_at | DATETIME(6) | NOT NULL | Data de criação |
+| updated_at | DATETIME(6) | NOT NULL | Data da última atualização |
+
+### restaurants
+
+Armazena os restaurantes cadastrados, cada um vinculado a um usuário dono.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT | Identificador único |
+| name | VARCHAR(200) | NOT NULL | Nome do restaurante |
+| address | VARCHAR(500) | NOT NULL | Endereço completo |
+| cuisine_type | VARCHAR(100) | NOT NULL | Tipo de cozinha (ex.: "Italiana", "Japonesa") |
+| opening_hours | VARCHAR(200) | NOT NULL | Horário de funcionamento |
+| owner_id | BIGINT | FK → users(id), NOT NULL | Dono do restaurante |
+| created_at | DATETIME(6) | NOT NULL | Data de criação |
+| updated_at | DATETIME(6) | NOT NULL | Data da última atualização |
+
+### menu_items
+
+Armazena os itens do cardápio de cada restaurante.
+
+| Coluna | Tipo | Restrições | Descrição |
+|---|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT | Identificador único |
+| name | VARCHAR(200) | NOT NULL | Nome do item |
+| description | TEXT | — | Descrição detalhada |
+| price | DECIMAL(10,2) | NOT NULL | Preço em reais |
+| available_for_dine_in | BIT(1) | NOT NULL, DEFAULT FALSE | Disponível apenas para consumo no local |
+| photo_path | VARCHAR(500) | — | Caminho da foto do prato |
+| restaurant_id | BIGINT | FK → restaurants(id), NOT NULL | Restaurante ao qual pertence |
+| created_at | DATETIME(6) | NOT NULL | Data de criação |
+| updated_at | DATETIME(6) | NOT NULL | Data da última atualização |
+
+### Script de referência
+
+O arquivo [`src/main/resources/db/migration/V1__init.sql`](src/main/resources/db/migration/V1__init.sql) contém o DDL completo para MySQL, incluindo `CREATE TABLE`, foreign keys e índices. Pode ser usado como referência ou executado manualmente se necessário.
+
+---
 
 ## Como executar
 
@@ -59,100 +129,100 @@ O repositório já possui a base do projeto Spring Boot e a estrutura de pacotes
 
 - Java 21
 - Maven 3.9+
+- Docker 24+ e Docker Compose 2.20+ (para execução com MySQL)
 
-### Execução local
+### Local (H2 em memória — desenvolvimento)
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-No Windows:
+A aplicação inicia com H2 em memória na porta `8080`. As tabelas são criadas automaticamente.  
+Para acessar o console H2: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:gastrohub`).
 
-```powershell
-mvnw.cmd spring-boot:run
-```
-
-### Build
+### Docker (MySQL 8.0 — produção)
 
 ```bash
-./mvnw clean package
+# Build da imagem
+docker compose build
+
+# Subir serviços (MySQL + API)
+docker compose up -d
+
+# Acompanhar logs da API
+docker compose logs -f gastrohub-api
+
+# Verificar containers
+docker compose ps
+
+# Acessar o MySQL
+docker exec -it gastrohub-mysql mysql -u gastrohub -pgastrohub123
+
+# Parar e limpar volumes
+docker compose down -v
 ```
+
+### Acessos
+
+| Serviço | URL / Credenciais |
+|---|---|
+| API | http://localhost:8080 |
+| MySQL | localhost:3306, user `gastrohub`, pass `gastrohub123` |
+| H2 Console | http://localhost:8080/h2-console (apenas em dev) |
+
+---
+
+## Endpoints previstos (Fase 2)
+
+Os endpoints abaixo serão implementados pelos colegas. As entidades e o banco já estão prontos.
+
+| Recurso | Métodos |
+|---|---|
+| Tipos de usuário | `GET/POST /roles`, `GET/PUT/DELETE /roles/{id}` |
+| Usuários | `GET/POST /users`, `GET/PUT/DELETE /users/{id}` |
+| Restaurantes | `GET/POST /restaurants`, `GET/PUT/DELETE /restaurants/{id}` |
+| Itens do cardápio | `GET/POST /menu-items`, `GET/PUT/DELETE /menu-items/{id}` |
+
+---
 
 ## Configuração
 
-A configuração principal da aplicação fica em `src/main/resources/application.properties`.
+### application.properties
 
-Como a base ainda está inicial, a recomendação é evoluir esse arquivo com:
+As propriedades de banco são configuradas via variáveis de ambiente com fallback para H2:
 
-- configuração do banco de dados;
-- perfis de ambiente;
-- parâmetros de porta;
-- logs e propriedades específicas da API.
+```properties
+spring.datasource.url=${DB_URL:jdbc:h2:mem:gastrohub}
+spring.datasource.username=${DB_USERNAME:sa}
+spring.datasource.password=${DB_PASSWORD:}
+spring.datasource.driver-class-name=${DB_DRIVER:org.h2.Driver}
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.dialect=${DB_DIALECT:org.hibernate.dialect.H2Dialect}
+```
 
-## Endpoints previstos
+No Docker, o `docker-compose.yml` injeta as variáveis para conectar ao MySQL.
 
-Os endpoints abaixo representam a cobertura esperada para a fase 2:
+### settings.xml
 
-- `Tipo de usuário`
-  - `GET /roles`
-  - `GET /roles/{id}`
-  - `POST /roles`
-  - `PUT /roles/{id}`
-  - `DELETE /roles/{id}`
+O arquivo `.mvn/settings.xml` contém a configuração Maven do projeto com mirrors para Maven Central e Spring Milestones. Ele está ignorado pelo `.gitignore`.
 
-- `Usuários`
-  - `GET /users`
-  - `GET /users/{id}`
-  - `POST /users`
-  - `PUT /users/{id}`
-  - `DELETE /users/{id}`
-
-- `Restaurantes`
-  - `GET /restaurants`
-  - `GET /restaurants/{id}`
-  - `POST /restaurants`
-  - `PUT /restaurants/{id}`
-  - `DELETE /restaurants/{id}`
-
-- `Itens do cardápio`
-  - `GET /menu-items`
-  - `GET /menu-items/{id}`
-  - `POST /menu-items`
-  - `PUT /menu-items/{id}`
-  - `DELETE /menu-items/{id}`
-
-## Docker
-
-O enunciado exige um `docker-compose.yml` para subir aplicação e banco de dados. Quando o arquivo for adicionado, ele deve permitir:
-
-- subir a API Java;
-- subir o banco de dados;
-- conectar os serviços por rede interna;
-- facilitar a execução da solução por avaliadores.
+---
 
 ## Testes
 
-A fase pede:
+A ser implementado. Requisitos da Fase 2:
 
-- testes unitários com cobertura mínima de 80%;
-- testes de integração para validar os componentes essenciais.
+- Testes unitários com cobertura mínima de **80%**
+- Testes de integração para validar os componentes essenciais
 
-Recomenda-se organizar os testes por camada, mantendo foco em casos de uso e regras de negócio.
+---
 
-## Coleção de testes
+## Próximos passos
 
-Para facilitar a validação manual da API, o projeto deve incluir uma coleção no formato Postman Collection ou similar, contendo os principais cenários de criação, leitura, atualização e remoção.
-
-## Próximos passos sugeridos
-
-- implementar as entidades e contratos do domínio;
-- criar os casos de uso da aplicação;
-- expor os endpoints REST na camada de apresentação;
-- configurar persistência e banco;
-- adicionar `docker-compose.yml`;
-- incluir a coleção Postman;
-- completar a suíte de testes e medir cobertura.
-
-## Licença
-
-Projeto acadêmico desenvolvido para a fase 2 do Tech Challenge.
+- [ ] Implementar repositórios Spring Data JPA (`JpaRepository<>`)
+- [ ] Criar DTOs e casos de uso na camada `application`
+- [ ] Expor endpoints REST na camada `presentation`
+- [ ] Adicionar validações e tratamento de exceções
+- [ ] Incluir coleção Postman para testes manuais
+- [ ] Implementar suíte de testes com cobertura ≥ 80%
+- [ ] Gravar vídeo de apresentação (~5 min)
