@@ -19,7 +19,7 @@ public class UpdateRestaurantUseCase {
 
     public RestaurantResponse execute(UpdateRestaurantRequest updateRestaurantRequest){
         Restaurant restaurant = restaurantGateway.findById(updateRestaurantRequest.getId())
-                .orElseThrow(() -> new RestaurantNotFound("Restaurant not found."));
+                .orElseThrow(() -> new RestaurantNotFound(updateRestaurantRequest.getId()));
 
         restaurant.update(
                 updateRestaurantRequest.getName(),

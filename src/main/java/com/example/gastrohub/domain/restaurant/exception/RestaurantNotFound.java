@@ -10,4 +10,9 @@ public class RestaurantNotFound extends RuntimeException {
         super("Restaurant not found: " + restaurantId);
         this.restaurantId = restaurantId;
     }
+
+    public RestaurantNotFound(String message) {
+        super(message);
+        this.restaurantId = null;
+    }
 }

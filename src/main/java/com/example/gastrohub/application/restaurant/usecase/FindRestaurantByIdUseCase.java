@@ -18,7 +18,7 @@ public class FindRestaurantByIdUseCase {
 
     public RestaurantResponse execute(Long id){
         Restaurant restaurant = restaurantGateway.findById(id)
-                .orElseThrow(() -> new RestaurantNotFound("Restaurant not found"));
+                .orElseThrow(() -> new RestaurantNotFound(id));
 
         return RestaurantApplicationMapper.toOutput(restaurant);
     }

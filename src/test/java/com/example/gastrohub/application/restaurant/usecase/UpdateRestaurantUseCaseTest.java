@@ -98,7 +98,7 @@ class UpdateRestaurantUseCaseTest {
 
         // Assert
         assertEquals(
-                "Restaurant not found.",
+                "Restaurant not found: 1",
                 exception.getMessage()
         );
 

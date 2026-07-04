@@ -37,7 +37,7 @@ public class UserApplicationMapper {
                 user.getName(),
                 user.getEmail(),
                 user.getLogin(),
-                user.getRole().ordinal()
+                user.getRole().name()
         );
     }
 }

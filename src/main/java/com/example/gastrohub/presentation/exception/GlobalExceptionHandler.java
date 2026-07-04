@@ -2,6 +2,7 @@ package com.example.gastrohub.presentation.exception;
 
 import com.example.gastrohub.domain.menuitem.exception.MenuItemNotFound;
 import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
+import com.example.gastrohub.domain.role.exception.RoleNotFound;
 import com.example.gastrohub.domain.user.exception.EmailAlreadyExistsException;
 import com.example.gastrohub.domain.user.exception.UserNotFound;
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,6 +63,21 @@ public class GlobalExceptionHandler {
                 "/problems/restaurant-not-found",
                 request,
                 exception.getRestaurantId()
+        );
+    }
+
+    @ExceptionHandler(RoleNotFound.class)
+    public ResponseEntity<ProblemDetail> handleRoleNotFound(
+            RoleNotFound exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.NOT_FOUND,
+                "Role not found",
+                "The requested role was not found.",
+                "/problems/role-not-found",
+                request,
+                exception.getRoleId()
         );
     }
 

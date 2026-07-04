@@ -17,7 +17,7 @@ public class DeleteRestaurantUseCase {
     public void execute(Long id) {
 
         if (!restaurantGateway.existsById(id)){
-            throw new RestaurantNotFound("The restaurant doesn't exist.");
+            throw new RestaurantNotFound(id);
         }
 
         restaurantGateway.delete(id);

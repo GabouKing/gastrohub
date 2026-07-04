@@ -61,7 +61,7 @@ class DeleteRestaurantUseCaseTest {
 
         // Assert
         assertEquals(
-                "The restaurant doesn't exist.",
+                "Restaurant not found: 1",
                 exception.getMessage()
         );
 

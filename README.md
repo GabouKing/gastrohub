@@ -1,8 +1,6 @@
 # GastroHub
 
-GastroHub é um sistema de gestão compartilhado para restaurantes, desenvolvido para o **Tech Challenge da Fase 2** da pós-graduação. O sistema permite cadastro de tipos de usuário, usuários, restaurantes e itens de cardápio, seguindo uma arquitetura em camadas e boas práticas de desenvolvimento com Spring Boot.
-
-> Projeto acadêmico — a implementação dos CRUDs, controllers e testes será feita pelos colegas em etapas futuras.
+GastroHub é um sistema de gestão compartilhado para restaurantes. Sistema permite cadastro de usuários, restaurantes e itens de cardápio com arquitetura limpa (Clean Architecture) e Spring Boot.
 
 ---
 
@@ -14,10 +12,12 @@ GastroHub é um sistema de gestão compartilhado para restaurantes, desenvolvido
 | Spring Boot | 4.1.0 |
 | Spring Data JPA / Hibernate | 7.4 |
 | Spring Web MVC | — |
+| Jakarta Validation | — |
 | Lombok | — |
 | Maven | 3.9+ |
 | H2 Database | dev (embedded) |
 | MySQL 8.0 | produção / Docker |
+| Flyway | migrações (hml/prd) |
 | Docker | 24+ |
 
 ---
@@ -26,26 +26,55 @@ GastroHub é um sistema de gestão compartilhado para restaurantes, desenvolvido
 
 ```
 src/main/java/com/example/gastrohub/
-├── GastrohubApplication.java         # Entry point Spring Boot
-├── domain/
-│   └── entity/
-│       ├── UserType.java             # Tipo de usuário
-│       ├── User.java                 # Usuário
-│       ├── Restaurant.java           # Restaurante
-│       └── MenuItem.java             # Item do cardápio
-├── application/                      # (a implementar — casos de uso)
-├── infrastructure/                   # (a implementar — persistência)
-└── presentation/                     # (a implementar — controllers REST)
+├── GastrohubApplication.java              # Entry point Spring Boot
+├── domain/                                # Camada de domínio (sem frameworks)
+│   ├── user/                              # Usuário + UserRole enum
+│   ├── restaurant/                        # Restaurante + CuisineType enum
+│   ├── menuitem/                          # Item do cardápio
+│   └── role/                              # Papéis/funções do sistema
+├── application/                           # Casos de uso + DTOs + mappers
+│   ├── user/
+│   ├── restaurant/
+│   ├── menuitem/
+│   └── role/
+├── infra/
+│   └── persistence/                       # JPA entities + repositories + adapters
+│       ├── entity/                        # UserJpaEntity, RestaurantJpaEntity, MenuItemJpaEntity
+│       ├── repository/                    # Spring Data JPA interfaces
+│       ├── mapper/                        # Mapeamento JPA <-> Domain
+│       ├── adapter/                       # Implementação dos Gateways
+│       └── role/                          # Role persistence (entity/repo/mapper/adapter)
+└── presentation/                          # Controllers REST + exception handler
+    ├── user/
+    ├── menuitem/
+    ├── role/
+    └── exception/                         # GlobalExceptionHandler (RFC 7807)
 
 src/main/resources/
-├── application.properties            # Configuração da aplicação
+├── application.yml                        # Configuração centralizada com perfis
 └── db/
     └── migration/
-        └── V1__init.sql              # Script DDL MySQL (referência)
+        └── V1__init.sql                   # Migração Flyway (MySQL)
 
 src/test/java/com/example/gastrohub/
-└── GastrohubApplicationTests.java    # Smoke test
+├── GastrohubApplicationTests.java          # Smoke test
+├── application/restaurant/                # Testes use cases Restaurant
+├── application/menuitem/                  # Testes use cases MenuItem
+├── application/role/                      # Testes use cases Role
+└── application/user/                      # Testes use cases User
 ```
+
+---
+
+## Perfis
+
+| Perfil | Banco | DDL | Flyway | Uso |
+|---|---|---|---|---|
+| `dev` (padrão) | H2 em memória | `update` | disabled | Desenvolvimento local |
+| `hml` | MySQL (env vars) | `validate` | enabled | Homologação |
+| `prd` | MySQL (env vars) | `validate` | enabled | Produção |
+
+Ativar perfil: `--spring.profiles.active=hml`
 
 ---
 
@@ -54,72 +83,51 @@ src/test/java/com/example/gastrohub/
 ### Modelo relacional
 
 ```
-user_types (1) ──── (N) users (1) ──── (N) restaurants (1) ──── (N) menu_items
+users (1) --- (N) restaurants (1) --- (N) menu_items
+roles (N)                              (roles são independentes)
 ```
-
-As tabelas são geradas automaticamente pelo Hibernate via `spring.jpa.hibernate.ddl-auto=update`
-— **nenhum script manual é necessário** para criar o schema.
-
-### user_types
-
-Armazena os perfis de usuário do sistema (ex.: "Dono de Restaurante", "Cliente").
-
-| Coluna | Tipo | Restrições | Descrição |
-|---|---|---|---|
-| id | BIGINT | PK, AUTO_INCREMENT | Identificador único |
-| name | VARCHAR(100) | NOT NULL, UNIQUE | Nome do tipo |
-| created_at | DATETIME(6) | NOT NULL | Data de criação |
-| updated_at | DATETIME(6) | NOT NULL | Data da última atualização |
 
 ### users
 
-Armazena os usuários do sistema, cada um associado a um tipo.
-
-| Coluna | Tipo | Restrições | Descrição |
-|---|---|---|---|
-| id | BIGINT | PK, AUTO_INCREMENT | Identificador único |
-| name | VARCHAR(150) | NOT NULL | Nome completo |
-| email | VARCHAR(200) | NOT NULL, UNIQUE | E-mail (login) |
-| password | VARCHAR(255) | NOT NULL | Hash da senha |
-| phone | VARCHAR(20) | — | Telefone de contato |
-| user_type_id | BIGINT | FK → user_types(id), NOT NULL | Tipo de usuário |
-| created_at | DATETIME(6) | NOT NULL | Data de criação |
-| updated_at | DATETIME(6) | NOT NULL | Data da última atualização |
+| Coluna | Tipo | Restrições |
+|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT |
+| name | VARCHAR(150) | NOT NULL |
+| email | VARCHAR(200) | NOT NULL, UNIQUE |
+| login | VARCHAR(50) | NOT NULL, UNIQUE |
+| password | VARCHAR(255) | NOT NULL |
+| role | VARCHAR(50) | NOT NULL, DEFAULT 'USER_CLIENT' |
 
 ### restaurants
 
-Armazena os restaurantes cadastrados, cada um vinculado a um usuário dono.
-
-| Coluna | Tipo | Restrições | Descrição |
-|---|---|---|---|
-| id | BIGINT | PK, AUTO_INCREMENT | Identificador único |
-| name | VARCHAR(200) | NOT NULL | Nome do restaurante |
-| address | VARCHAR(500) | NOT NULL | Endereço completo |
-| cuisine_type | VARCHAR(100) | NOT NULL | Tipo de cozinha (ex.: "Italiana", "Japonesa") |
-| opening_hours | VARCHAR(200) | NOT NULL | Horário de funcionamento |
-| owner_id | BIGINT | FK → users(id), NOT NULL | Dono do restaurante |
-| created_at | DATETIME(6) | NOT NULL | Data de criação |
-| updated_at | DATETIME(6) | NOT NULL | Data da última atualização |
+| Coluna | Tipo | Restrições |
+|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT |
+| name | VARCHAR(200) | NOT NULL |
+| address | VARCHAR(500) | NOT NULL |
+| cuisine_type | VARCHAR(100) | NOT NULL |
+| opening_hours | VARCHAR(200) | NOT NULL |
+| owner_id | BIGINT | FK → users(id), NOT NULL |
 
 ### menu_items
 
-Armazena os itens do cardápio de cada restaurante.
+| Coluna | Tipo | Restrições |
+|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT |
+| name | VARCHAR(200) | NOT NULL |
+| description | TEXT | — |
+| price | DECIMAL(10,2) | NOT NULL |
+| available_only_on_restaurant | BOOLEAN | NOT NULL, DEFAULT FALSE |
+| photo_path | VARCHAR(500) | — |
+| restaurant_id | BIGINT | FK → restaurants(id), NOT NULL |
 
-| Coluna | Tipo | Restrições | Descrição |
-|---|---|---|---|
-| id | BIGINT | PK, AUTO_INCREMENT | Identificador único |
-| name | VARCHAR(200) | NOT NULL | Nome do item |
-| description | TEXT | — | Descrição detalhada |
-| price | DECIMAL(10,2) | NOT NULL | Preço em reais |
-| available_for_dine_in | BIT(1) | NOT NULL, DEFAULT FALSE | Disponível apenas para consumo no local |
-| photo_path | VARCHAR(500) | — | Caminho da foto do prato |
-| restaurant_id | BIGINT | FK → restaurants(id), NOT NULL | Restaurante ao qual pertence |
-| created_at | DATETIME(6) | NOT NULL | Data de criação |
-| updated_at | DATETIME(6) | NOT NULL | Data da última atualização |
+### roles
 
-### Script de referência
-
-O arquivo [`src/main/resources/db/migration/V1__init.sql`](src/main/resources/db/migration/V1__init.sql) contém o DDL completo para MySQL, incluindo `CREATE TABLE`, foreign keys e índices. Pode ser usado como referência ou executado manualmente se necessário.
+| Coluna | Tipo | Restrições |
+|---|---|---|
+| id | BIGINT | PK, AUTO_INCREMENT |
+| name | VARCHAR(50) | NOT NULL, UNIQUE |
+| description | VARCHAR(255) | — |
 
 ---
 
@@ -129,100 +137,132 @@ O arquivo [`src/main/resources/db/migration/V1__init.sql`](src/main/resources/db
 
 - Java 21
 - Maven 3.9+
-- Docker 24+ e Docker Compose 2.20+ (para execução com MySQL)
+- Docker 24+ e Docker Compose 2.20+ (para MySQL)
 
-### Local (H2 em memória — desenvolvimento)
+### Local (H2 em memória — dev)
 
 ```bash
+cd gastrohub
 ./mvnw spring-boot:run
 ```
 
-A aplicação inicia com H2 em memória na porta `8080`. As tabelas são criadas automaticamente.  
-Para acessar o console H2: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:gastrohub`).
+Aplicaçao inicia com H2 na porta `8080`. Tabelas criadas automaticamente.
+Console H2: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:gastrohub`)
 
-### Docker (MySQL 8.0 — produção)
+### Docker (MySQL — hml/prd)
 
 ```bash
-# Build da imagem
 docker compose build
-
-# Subir serviços (MySQL + API)
 docker compose up -d
-
-# Acompanhar logs da API
 docker compose logs -f gastrohub-api
-
-# Verificar containers
-docker compose ps
-
-# Acessar o MySQL
-docker exec -it gastrohub-mysql mysql -u gastrohub -pgastrohub123
-
-# Parar e limpar volumes
-docker compose down -v
 ```
 
-### Acessos
+### Perfil específico
 
-| Serviço | URL / Credenciais |
-|---|---|
-| API | http://localhost:8080 |
-| MySQL | localhost:3306, user `gastrohub`, pass `gastrohub123` |
-| H2 Console | http://localhost:8080/h2-console (apenas em dev) |
+```bash
+# HML
+./mvnw spring-boot:run -Dspring-boot.run.profiles=hml
+
+# PRD
+./mvnw spring-boot:run -Dspring-boot.run.profiles=prd
+```
+
+### Variáveis de ambiente
+
+| Variável | Padrão (dev) | Padrão (hml/prd) |
+|---|---|---|
+| `DB_URL` | `jdbc:h2:mem:gastrohub` | `jdbc:mysql://localhost:3306/gastrohub` |
+| `DB_USERNAME` | `sa` | `root` |
+| `DB_PASSWORD` | vazio | `root` |
+| `DB_DRIVER` | `org.h2.Driver` | `com.mysql.cj.jdbc.Driver` |
+| `DB_DIALECT` | `org.hibernate.dialect.H2Dialect` | `org.hibernate.dialect.MySQLDialect` |
 
 ---
 
-## Endpoints previstos (Fase 2)
+## Endpoints
 
-Os endpoints abaixo serão implementados pelos colegas. As entidades e o banco já estão prontos.
+### Users
 
-| Recurso | Métodos |
-|---|---|
-| Tipos de usuário | `GET/POST /roles`, `GET/PUT/DELETE /roles/{id}` |
-| Usuários | `GET/POST /users`, `GET/PUT/DELETE /users/{id}` |
-| Restaurantes | `GET/POST /restaurants`, `GET/PUT/DELETE /restaurants/{id}` |
-| Itens do cardápio | `GET/POST /menu-items`, `GET/PUT/DELETE /menu-items/{id}` |
+| Método | Path | Descrição |
+|---|---|---|
+| POST | `/users` | Criar usuário |
+| GET | `/users` | Listar usuários |
+| GET | `/users/{id}` | Buscar usuário por ID |
+| PUT | `/users/{id}` | Atualizar usuário |
+| PATCH | `/users/{id}/role` | Atualizar role do usuário |
+| DELETE | `/users/{id}` | Remover usuário |
+
+### Restaurants
+
+| Método | Path | Descrição |
+|---|---|---|
+| POST | `/restaurants` | *Controller não implementado* |
+| GET | `/restaurants` | *Controller não implementado* |
+| GET | `/restaurants/{id}` | *Controller não implementado* |
+| GET | `/restaurants/name/{name}` | *Controller não implementado* |
+| PUT | `/restaurants/{id}` | *Controller não implementado* |
+| DELETE | `/restaurants/{id}` | *Controller não implementado* |
+
+### Menu Items
+
+| Método | Path | Descrição |
+|---|---|---|
+| POST | `/restaurants/{restaurantId}/menu-items` | Criar item |
+| GET | `/restaurants/{restaurantId}/menu-items` | Listar itens do restaurante |
+| GET | `/menu-items/{id}` | Buscar item por ID |
+| PUT | `/menu-items/{id}` | Atualizar item |
+| DELETE | `/menu-items/{id}` | Remover item |
+
+### Roles
+
+| Método | Path | Descrição |
+|---|---|---|
+| POST | `/roles` | Criar role |
+| GET | `/roles` | Listar roles |
+| GET | `/roles/{id}` | Buscar role por ID |
+| PUT | `/roles/{id}` | Atualizar role |
+| DELETE | `/roles/{id}` | Remover role |
 
 ---
 
 ## Configuração
 
-### application.properties
+### application.yml
 
-As propriedades de banco são configuradas via variáveis de ambiente com fallback para H2:
+Configuração centralizada em `src/main/resources/application.yml` com perfis `dev`, `hml` e `prd`. Em dev, H2 + ddl-auto. Em hml/prd, MySQL + Flyway.
 
-```properties
-spring.datasource.url=${DB_URL:jdbc:h2:mem:gastrohub}
-spring.datasource.username=${DB_USERNAME:sa}
-spring.datasource.password=${DB_PASSWORD:}
-spring.datasource.driver-class-name=${DB_DRIVER:org.h2.Driver}
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.properties.hibernate.dialect=${DB_DIALECT:org.hibernate.dialect.H2Dialect}
-```
+### Flyway
 
-No Docker, o `docker-compose.yml` injeta as variáveis para conectar ao MySQL.
+Migrações em `src/main/resources/db/migration/`. Ativado apenas nos perfis `hml` e `prd`. Em dev, Hibernate gerencia o schema via `ddl-auto=update`.
 
 ### settings.xml
 
-O arquivo `.mvn/settings.xml` contém a configuração Maven do projeto com mirrors para Maven Central e Spring Milestones. Ele está ignorado pelo `.gitignore`.
+`.mvn/settings.xml` contém configuração Maven com mirrors para Maven Central e Spring Milestones. Ignorado pelo `.gitignore`.
 
 ---
 
 ## Testes
 
-A ser implementado. Requisitos da Fase 2:
+```bash
+./mvnw test
+```
 
-- Testes unitários com cobertura mínima de **80%**
-- Testes de integração para validar os componentes essenciais
+Atualmente **47 testes**, todos passando:
+- Use cases Restaurant (8)
+- Use cases MenuItem (6)
+- Use cases User (6)
+- Use cases Role (12)
+- Domain Restaurant validation (11)
+- Smoke test (1)
+- User-Role vincul (2)
+- MenuItem CRUD (1)
 
 ---
 
-## Próximos passos
+## Acessos
 
-- [ ] Implementar repositórios Spring Data JPA (`JpaRepository<>`)
-- [ ] Criar DTOs e casos de uso na camada `application`
-- [ ] Expor endpoints REST na camada `presentation`
-- [ ] Adicionar validações e tratamento de exceções
-- [ ] Incluir coleção Postman para testes manuais
-- [ ] Implementar suíte de testes com cobertura ≥ 80%
-- [ ] Gravar vídeo de apresentação (~5 min)
+| Serviço | URL / Credenciais |
+|---|---|
+| API | http://localhost:8080 |
+| MySQL | localhost:3306, user `gastrohub`, pass `gastrohub123` |
+| H2 Console | http://localhost:8080/h2-console (apenas dev) |
