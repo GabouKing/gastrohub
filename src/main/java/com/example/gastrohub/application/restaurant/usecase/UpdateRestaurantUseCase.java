@@ -1,7 +1,7 @@
 package com.example.gastrohub.application.restaurant.usecase;
 
-import com.example.gastrohub.application.restaurant.dto.RestaurantResponse;
-import com.example.gastrohub.application.restaurant.dto.UpdateRestaurantRequest;
+import com.example.gastrohub.application.restaurant.dto.RestaurantOutput;
+import com.example.gastrohub.application.restaurant.dto.UpdateRestaurantInput;
 import com.example.gastrohub.application.restaurant.mapper.RestaurantApplicationMapper;
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
@@ -17,15 +17,16 @@ public class UpdateRestaurantUseCase {
         this.restaurantGateway = restaurantGateway;
     }
 
-    public RestaurantResponse execute(UpdateRestaurantRequest updateRestaurantRequest){
-        Restaurant restaurant = restaurantGateway.findById(updateRestaurantRequest.getId())
+    public RestaurantOutput execute(Long id ,UpdateRestaurantInput updateRestaurantInput){
+        Restaurant restaurant = restaurantGateway.findById(id)
                 .orElseThrow(() -> new RestaurantNotFound("Restaurant not found."));
 
+
         restaurant.update(
-                updateRestaurantRequest.getName(),
-                updateRestaurantRequest.getAddress(),
-                updateRestaurantRequest.getCuisineType(),
-                updateRestaurantRequest.getOpeningHours()
+                updateRestaurantInput.getName(),
+                updateRestaurantInput.getAddress(),
+                updateRestaurantInput.getCuisineType(),
+                updateRestaurantInput.getOpeningHours()
         );
 
         Restaurant updatedRestaurant = restaurantGateway.save(restaurant);

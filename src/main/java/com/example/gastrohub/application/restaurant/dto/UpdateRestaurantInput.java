@@ -6,10 +6,12 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class CreateRestaurantRequest {
+public class UpdateRestaurantInput {
     private String name;
     private String address;
     private CuisineType cuisineType;
     private String openingHours;
     private Long userId;
+
 }
+

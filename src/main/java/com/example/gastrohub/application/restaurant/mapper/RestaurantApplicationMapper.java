@@ -1,36 +1,35 @@
 package com.example.gastrohub.application.restaurant.mapper;
 
-import com.example.gastrohub.application.restaurant.dto.CreateRestaurantRequest;
-import com.example.gastrohub.application.restaurant.dto.RestaurantResponse;
-import com.example.gastrohub.application.restaurant.dto.UpdateRestaurantRequest;
+import com.example.gastrohub.application.restaurant.dto.CreateRestaurantInput;
+import com.example.gastrohub.application.restaurant.dto.RestaurantOutput;
+import com.example.gastrohub.application.restaurant.dto.UpdateRestaurantInput;
 import com.example.gastrohub.domain.restaurant.Restaurant;
 
 public class RestaurantApplicationMapper {
 
-    public static Restaurant toDomain(CreateRestaurantRequest createRestaurantRequest) {
+    public static Restaurant toDomain(CreateRestaurantInput createRestaurantInput) {
         return new Restaurant(
 
-                createRestaurantRequest.getName(),
-                createRestaurantRequest.getAddress(),
-                createRestaurantRequest.getCuisineType(),
-                createRestaurantRequest.getOpeningHours(),
-                createRestaurantRequest.getUserId()
+                createRestaurantInput.getName(),
+                createRestaurantInput.getAddress(),
+                createRestaurantInput.getCuisineType(),
+                createRestaurantInput.getOpeningHours(),
+                createRestaurantInput.getUserId()
                 );
     }
 
-    public static Restaurant toDomain(UpdateRestaurantRequest updateRestaurantRequest) {
+    public static Restaurant toDomain(UpdateRestaurantInput updateRestaurantInput) {
         return new Restaurant(
-                updateRestaurantRequest.getId(),
-                updateRestaurantRequest.getName(),
-                updateRestaurantRequest.getAddress(),
-                updateRestaurantRequest.getCuisineType(),
-                updateRestaurantRequest.getOpeningHours(),
-                updateRestaurantRequest.getUserId()
+                updateRestaurantInput.getName(),
+                updateRestaurantInput.getAddress(),
+                updateRestaurantInput.getCuisineType(),
+                updateRestaurantInput.getOpeningHours(),
+                updateRestaurantInput.getUserId()
         );
     }
 
-    public static RestaurantResponse toOutput(Restaurant restaurant) {
-        return new RestaurantResponse(
+    public static RestaurantOutput toOutput(Restaurant restaurant) {
+        return new RestaurantOutput(
                 restaurant.getId(),
                 restaurant.getName(),
                 restaurant.getAddress(),

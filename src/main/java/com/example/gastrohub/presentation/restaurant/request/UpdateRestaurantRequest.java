@@ -1,4 +1,4 @@
-package com.example.gastrohub.application.restaurant.dto;
+package com.example.gastrohub.presentation.restaurant.request;
 
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class UpdateRestaurantRequest {
-    private Long id;
     private String name;
     private String address;
     private CuisineType cuisineType;

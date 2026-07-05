@@ -7,19 +7,27 @@ import com.example.gastrohub.domain.restaurant.RestaurantGateway;
 import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-public class FindRestaurantByNameUseCase {
+public class FindRestaurantByNameContaining {
 
     private final RestaurantGateway restaurantGateway;
 
-    public FindRestaurantByNameUseCase(RestaurantGateway restaurantGateway) {
+    public FindRestaurantByNameContaining(RestaurantGateway restaurantGateway) {
         this.restaurantGateway = restaurantGateway;
     }
 
-    public RestaurantOutput execute(String name){
-        Restaurant restaurant = restaurantGateway.findByName(name)
-                .orElseThrow(() -> new RestaurantNotFound("Restaurant not found"));
+    public List<RestaurantOutput> execute(String name) {
 
-        return RestaurantApplicationMapper.toOutput(restaurant);
+        List<Restaurant> restaurants = restaurantGateway.findByNameContaining(name);
+
+        if (restaurants.isEmpty()) {
+            throw new RestaurantNotFound("Restaurant not found");
+        }
+
+        return restaurants.stream()
+                .map(RestaurantApplicationMapper::toOutput)
+                .toList();
     }
 }

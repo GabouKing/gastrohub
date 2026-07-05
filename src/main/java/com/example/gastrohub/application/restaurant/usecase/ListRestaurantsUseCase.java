@@ -1,6 +1,6 @@
 package com.example.gastrohub.application.restaurant.usecase;
 
-import com.example.gastrohub.application.restaurant.dto.RestaurantResponse;
+import com.example.gastrohub.application.restaurant.dto.RestaurantOutput;
 import com.example.gastrohub.application.restaurant.mapper.RestaurantApplicationMapper;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ public class ListRestaurantsUseCase {
         this.restaurantGateway = restaurantGateway;
     }
 
-    public List<RestaurantResponse> execute() {
+    public List<RestaurantOutput> execute() {
         return restaurantGateway.findAll().stream().map(RestaurantApplicationMapper::toOutput).toList();
     }
 }

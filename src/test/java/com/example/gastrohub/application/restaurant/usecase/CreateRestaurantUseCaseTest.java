@@ -1,7 +1,7 @@
 package com.example.gastrohub.application.restaurant.usecase;
 
-import com.example.gastrohub.application.restaurant.dto.CreateRestaurantRequest;
-import com.example.gastrohub.application.restaurant.dto.RestaurantResponse;
+import com.example.gastrohub.application.restaurant.dto.CreateRestaurantInput;
+import com.example.gastrohub.application.restaurant.dto.RestaurantOutput;
 import com.example.gastrohub.application.restaurant.mapper.RestaurantApplicationMapper;
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
@@ -34,12 +34,12 @@ class CreateRestaurantUseCaseTest {
     @InjectMocks
     private CreateRestaurantUseCase createRestaurantUseCase;
 
-    private CreateRestaurantRequest request;
+    private CreateRestaurantInput request;
     private Restaurant restaurant;
 
     @BeforeEach
     void setUp() {
-        request = new CreateRestaurantRequest(
+        request = new CreateRestaurantInput(
                 "Pizza House",
                 "123 Main Street",
                 CuisineType.ITALIAN,
@@ -64,7 +64,7 @@ class CreateRestaurantUseCaseTest {
                 .thenReturn(restaurant);
 
         // Act
-        RestaurantResponse response = createRestaurantUseCase.execute(request);
+        RestaurantOutput response = createRestaurantUseCase.execute(request);
 
         // Assert
         assertNotNull(response);

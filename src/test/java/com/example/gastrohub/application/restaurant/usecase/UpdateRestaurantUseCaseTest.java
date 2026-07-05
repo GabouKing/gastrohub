@@ -1,7 +1,6 @@
 package com.example.gastrohub.application.restaurant.usecase;
-
-import com.example.gastrohub.application.restaurant.dto.RestaurantResponse;
-import com.example.gastrohub.application.restaurant.dto.UpdateRestaurantRequest;
+import com.example.gastrohub.application.restaurant.dto.RestaurantOutput;
+import com.example.gastrohub.application.restaurant.dto.UpdateRestaurantInput;
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
@@ -18,6 +17,7 @@ import java.lang.reflect.Field;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,10 +30,13 @@ class UpdateRestaurantUseCaseTest {
     private UpdateRestaurantUseCase updateRestaurantUseCase;
 
     private Restaurant restaurant;
-    private UpdateRestaurantRequest request;
+    private UpdateRestaurantInput request;
+
+    private static final Long RESTAURANT_ID = 1L;
 
     @BeforeEach
     void setUp() throws Exception {
+
         restaurant = new Restaurant(
                 "Pizza House",
                 "123 Main Street",
@@ -42,10 +45,9 @@ class UpdateRestaurantUseCaseTest {
                 1L
         );
 
-        setId(restaurant, 1L);
+        setId(restaurant, RESTAURANT_ID);
 
-        request = new UpdateRestaurantRequest(
-                1L,
+        request = new UpdateRestaurantInput(
                 "Burger House",
                 "456 Main Street",
                 CuisineType.BRAZILIAN,
@@ -57,20 +59,19 @@ class UpdateRestaurantUseCaseTest {
     @Test
     @DisplayName("Should update restaurant successfully")
     void shouldUpdateRestaurantSuccessfully() {
-        // Arrange
-        when(restaurantGateway.findById(request.getId()))
+
+        when(restaurantGateway.findById(RESTAURANT_ID))
                 .thenReturn(Optional.of(restaurant));
 
         when(restaurantGateway.save(any(Restaurant.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
 
-        // Act
-        RestaurantResponse response = updateRestaurantUseCase.execute(request);
+        RestaurantOutput response =
+                updateRestaurantUseCase.execute(RESTAURANT_ID, request);
 
-        // Assert
         assertAll(
                 () -> assertNotNull(response),
-                () -> assertEquals(request.getId(), response.getId()),
+                () -> assertEquals(RESTAURANT_ID, response.getId()),
                 () -> assertEquals(request.getName(), response.getName()),
                 () -> assertEquals(request.getAddress(), response.getAddress()),
                 () -> assertEquals(request.getCuisineType(), response.getCuisineType()),
@@ -78,7 +79,7 @@ class UpdateRestaurantUseCaseTest {
                 () -> assertEquals(1L, response.getUserId())
         );
 
-        verify(restaurantGateway).findById(request.getId());
+        verify(restaurantGateway).findById(RESTAURANT_ID);
         verify(restaurantGateway).save(restaurant);
         verifyNoMoreInteractions(restaurantGateway);
     }
@@ -86,23 +87,18 @@ class UpdateRestaurantUseCaseTest {
     @Test
     @DisplayName("Should throw RestaurantNotFound when restaurant does not exist")
     void shouldThrowRestaurantNotFoundWhenRestaurantDoesNotExist() {
-        // Arrange
-        when(restaurantGateway.findById(request.getId()))
+
+        when(restaurantGateway.findById(RESTAURANT_ID))
                 .thenReturn(Optional.empty());
 
-        // Act
         RestaurantNotFound exception = assertThrows(
                 RestaurantNotFound.class,
-                () -> updateRestaurantUseCase.execute(request)
+                () -> updateRestaurantUseCase.execute(RESTAURANT_ID, request)
         );
 
-        // Assert
-        assertEquals(
-                "Restaurant not found.",
-                exception.getMessage()
-        );
+        assertEquals("Restaurant not found.", exception.getMessage());
 
-        verify(restaurantGateway).findById(request.getId());
+        verify(restaurantGateway).findById(RESTAURANT_ID);
         verify(restaurantGateway, never()).save(any());
 
         verifyNoMoreInteractions(restaurantGateway);

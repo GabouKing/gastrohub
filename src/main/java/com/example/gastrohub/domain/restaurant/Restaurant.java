@@ -2,10 +2,12 @@ package com.example.gastrohub.domain.restaurant;
 
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
 import com.example.gastrohub.domain.restaurant.exception.*;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
+@Builder
 @EqualsAndHashCode(of = "id")
 public class Restaurant {
 

@@ -6,8 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class RestaurantResponse {
-    private Long id;
+public class CreateRestaurantInput {
     private String name;
     private String address;
     private CuisineType cuisineType;

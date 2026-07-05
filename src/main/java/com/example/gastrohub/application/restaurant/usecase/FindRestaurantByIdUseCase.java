@@ -1,6 +1,6 @@
 package com.example.gastrohub.application.restaurant.usecase;
 
-import com.example.gastrohub.application.restaurant.dto.RestaurantResponse;
+import com.example.gastrohub.application.restaurant.dto.RestaurantOutput;
 import com.example.gastrohub.application.restaurant.mapper.RestaurantApplicationMapper;
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
@@ -16,7 +16,7 @@ public class FindRestaurantByIdUseCase {
         this.restaurantGateway = restaurantGateway;
     }
 
-    public RestaurantResponse execute(Long id){
+    public RestaurantOutput execute(Long id){
         Restaurant restaurant = restaurantGateway.findById(id)
                 .orElseThrow(() -> new RestaurantNotFound("Restaurant not found"));
 

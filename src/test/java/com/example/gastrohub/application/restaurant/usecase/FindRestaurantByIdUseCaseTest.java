@@ -1,6 +1,6 @@
 package com.example.gastrohub.application.restaurant.usecase;
 
-import com.example.gastrohub.application.restaurant.dto.RestaurantResponse;
+import com.example.gastrohub.application.restaurant.dto.RestaurantOutput;
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
@@ -52,7 +52,7 @@ class FindRestaurantByIdUseCaseTest {
                 .thenReturn(Optional.of(restaurant));
 
         // Act
-        RestaurantResponse response =
+        RestaurantOutput response =
                 findRestaurantByIdUseCase.execute(restaurantId);
 
         // Assert
