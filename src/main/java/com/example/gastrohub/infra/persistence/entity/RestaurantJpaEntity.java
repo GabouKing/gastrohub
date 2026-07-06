@@ -1,7 +1,6 @@
-package com.example.gastrohub.infra.restaurant.persistence.entity;
+package com.example.gastrohub.infra.persistence.entity;
 
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
-import com.example.gastrohub.infra.persistence.entity.UserJpaEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

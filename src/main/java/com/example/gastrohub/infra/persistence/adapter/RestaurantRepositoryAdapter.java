@@ -1,13 +1,13 @@
-package com.example.gastrohub.infra.restaurant.persistence.adapter;
+package com.example.gastrohub.infra.persistence.adapter;
 
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
 import com.example.gastrohub.domain.user.exception.UserNotFound;
 import com.example.gastrohub.infra.persistence.entity.UserJpaEntity;
 import com.example.gastrohub.infra.persistence.repository.UserJpaRepository;
-import com.example.gastrohub.infra.restaurant.persistence.entity.RestaurantJpaEntity;
-import com.example.gastrohub.infra.restaurant.persistence.mapper.RestaurantPersistenceMapper;
-import com.example.gastrohub.infra.restaurant.persistence.repository.RestaurantJpaRepository;
+import com.example.gastrohub.infra.persistence.entity.RestaurantJpaEntity;
+import com.example.gastrohub.infra.persistence.mapper.RestaurantPersistenceMapper;
+import com.example.gastrohub.infra.persistence.repository.RestaurantJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

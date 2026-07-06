@@ -2,6 +2,7 @@ package com.example.gastrohub.presentation.restaurant;
 
 
 import com.example.gastrohub.application.restaurant.usecase.*;
+import com.example.gastrohub.presentation.restaurant.docs.RestaurantControllerDocs;
 import com.example.gastrohub.presentation.restaurant.mapper.RestaurantPresentationMapper;
 import com.example.gastrohub.presentation.restaurant.request.CreateRestaurantRequest;
 import com.example.gastrohub.presentation.restaurant.request.UpdateRestaurantRequest;
@@ -17,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/restaurants")
 @RequiredArgsConstructor
-public class RestaurantController {
+public class RestaurantController implements RestaurantControllerDocs {
     private final CreateRestaurantUseCase createRestaurantUseCase;
     private final FindRestaurantByIdUseCase findRestaurantByIdUseCase;
     private final FindRestaurantByNameUseCase findRestaurantByNameUseCase;
@@ -26,7 +27,9 @@ public class RestaurantController {
     private final UpdateRestaurantUseCase updateRestaurantUseCase;
     private final DeleteRestaurantUseCase deleteRestaurantUseCase;
 
+
     @PostMapping
+    @Override
     public ResponseEntity<RestaurantResponse> createRestaurant(@Valid @RequestBody CreateRestaurantRequest request) {
         var input = RestaurantPresentationMapper.toInput(request);
         var output = createRestaurantUseCase.execute(input);
@@ -36,6 +39,7 @@ public class RestaurantController {
     }
 
     @GetMapping("/id/{id}")
+    @Override
     public ResponseEntity<RestaurantResponse> findRestaurantById(@PathVariable Long id) {
         var output = findRestaurantByIdUseCase.execute(id);
         var response = RestaurantPresentationMapper.toResponse(output);
@@ -45,6 +49,7 @@ public class RestaurantController {
     }
 
     @GetMapping("/name/{name}")
+    @Override
     public ResponseEntity<RestaurantResponse> findRestaurantByName(@PathVariable String name) {
         var output = findRestaurantByNameUseCase.execute(name);
         var response = RestaurantPresentationMapper.toResponse(output);
@@ -54,6 +59,7 @@ public class RestaurantController {
     }
 
     @GetMapping
+    @Override
     public ResponseEntity<List<RestaurantResponse>> findAll() {
         var response = listRestaurantsUseCase.execute()
                 .stream()
@@ -63,6 +69,7 @@ public class RestaurantController {
     }
 
     @GetMapping("/search")
+    @Override
     public ResponseEntity<List<RestaurantResponse>> findRestaurantByNameContaining(
             @RequestParam String name) {
 
@@ -76,6 +83,7 @@ public class RestaurantController {
     }
 
     @PutMapping("/{id}")
+    @Override
     public ResponseEntity<RestaurantResponse> updateRestaurant(
             @PathVariable Long id,
             @Valid @RequestBody UpdateRestaurantRequest request) {
@@ -88,6 +96,7 @@ public class RestaurantController {
     }
 
     @DeleteMapping("/{id}")
+    @Override
     public ResponseEntity<?> deleteRestaurant(@PathVariable Long id) {
         deleteRestaurantUseCase.execute(id);
         return ResponseEntity.status(HttpStatus.OK).build();

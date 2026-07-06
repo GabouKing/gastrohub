@@ -1,6 +1,7 @@
 package com.example.gastrohub.presentation.user;
 
 import com.example.gastrohub.application.user.usecase.user.*;
+import com.example.gastrohub.presentation.user.docs.UserControllerDocs;
 import com.example.gastrohub.presentation.user.mapper.UserPresentationMapper;
 import com.example.gastrohub.presentation.user.request.CreateUserRequest;
 import com.example.gastrohub.presentation.user.request.UpdateUserRequest;
@@ -15,7 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerDocs {
     private final CreateUserUseCase createUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
     private final ListUserUseCase listUserUseCase;
@@ -23,6 +24,7 @@ public class UserController {
     private final DeleteUserUseCase deleteUserUseCase;
 
     @PostMapping
+    @Override
     public ResponseEntity<UserResponse> createUser(@RequestBody CreateUserRequest createUserRequest) {
         var input = UserPresentationMapper.toInput(createUserRequest);
         var output = createUserUseCase.execute(input);
@@ -32,6 +34,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @Override
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
             @RequestBody UpdateUserRequest updateUserRequest
@@ -45,6 +48,7 @@ public class UserController {
     }
 
     @GetMapping
+    @Override
     public ResponseEntity<List<UserResponse>> allUsers() {
         var response = listUserUseCase.execute()
                 .stream()
@@ -55,6 +59,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @Override
     public ResponseEntity<UserResponse> user(@PathVariable Long id) {
         var output = findUserByIdUseCase.execute(id);
         var response = UserPresentationMapper.toResponse(output);
@@ -62,6 +67,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
+    @Override
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         deleteUserUseCase.execute(id);
         return ResponseEntity.status(HttpStatus.OK).build();

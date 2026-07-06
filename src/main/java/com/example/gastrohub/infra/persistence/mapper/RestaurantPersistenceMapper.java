@@ -1,8 +1,8 @@
-package com.example.gastrohub.infra.restaurant.persistence.mapper;
+package com.example.gastrohub.infra.persistence.mapper;
 
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.infra.persistence.entity.UserJpaEntity;
-import com.example.gastrohub.infra.restaurant.persistence.entity.RestaurantJpaEntity;
+import com.example.gastrohub.infra.persistence.entity.RestaurantJpaEntity;
 import org.springframework.stereotype.Component;
 
 @Component

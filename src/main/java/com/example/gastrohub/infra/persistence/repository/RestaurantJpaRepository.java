@@ -1,6 +1,6 @@
-package com.example.gastrohub.infra.restaurant.persistence.repository;
+package com.example.gastrohub.infra.persistence.repository;
 
-import com.example.gastrohub.infra.restaurant.persistence.entity.RestaurantJpaEntity;
+import com.example.gastrohub.infra.persistence.entity.RestaurantJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

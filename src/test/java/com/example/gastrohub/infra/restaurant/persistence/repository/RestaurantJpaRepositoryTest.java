@@ -2,8 +2,9 @@ package com.example.gastrohub.infra.restaurant.persistence.repository;
 
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
 import com.example.gastrohub.infra.persistence.entity.UserJpaEntity;
+import com.example.gastrohub.infra.persistence.repository.RestaurantJpaRepository;
 import com.example.gastrohub.infra.persistence.repository.UserJpaRepository;
-import com.example.gastrohub.infra.restaurant.persistence.entity.RestaurantJpaEntity;
+import com.example.gastrohub.infra.persistence.entity.RestaurantJpaEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

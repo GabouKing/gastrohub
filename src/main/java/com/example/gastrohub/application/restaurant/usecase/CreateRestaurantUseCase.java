@@ -4,6 +4,7 @@ import com.example.gastrohub.application.restaurant.dto.CreateRestaurantInput;
 import com.example.gastrohub.application.restaurant.dto.RestaurantOutput;
 import com.example.gastrohub.application.restaurant.mapper.RestaurantApplicationMapper;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantAlreadyExistsException;
 import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
 import com.example.gastrohub.domain.user.User;
 import com.example.gastrohub.domain.user.UserGateway;
@@ -41,6 +42,10 @@ public class CreateRestaurantUseCase {
 
         if (restaurantGateway.existsByName(createRestaurantInput.getName())){
             throw new RestaurantNotFound("The restaurant already exists.");
+        }
+
+        if (restaurantGateway.existsByName(createRestaurantInput.getName())){
+            throw new RestaurantAlreadyExistsException("The restaurant already exists.");
         }
 
         var restaurant = RestaurantApplicationMapper.toDomain(createRestaurantInput);
