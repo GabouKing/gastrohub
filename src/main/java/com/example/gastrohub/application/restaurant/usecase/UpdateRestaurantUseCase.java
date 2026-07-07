@@ -5,7 +5,7 @@ import com.example.gastrohub.application.restaurant.dto.UpdateRestaurantInput;
 import com.example.gastrohub.application.restaurant.mapper.RestaurantApplicationMapper;
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
-import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException ;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,7 +19,7 @@ public class UpdateRestaurantUseCase {
 
     public RestaurantOutput execute(Long id ,UpdateRestaurantInput updateRestaurantInput){
         Restaurant restaurant = restaurantGateway.findById(id)
-                .orElseThrow(() -> new RestaurantNotFound("Restaurant not found."));
+                .orElseThrow(() -> new RestaurantNotFoundException ("Restaurant not found."));
 
 
         restaurant.update(

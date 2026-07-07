@@ -1,7 +1,7 @@
 package com.example.gastrohub.application.restaurant.usecase;
 
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
-import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException ;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,7 +17,7 @@ public class DeleteRestaurantUseCase {
     public void execute(Long id) {
 
         if (!restaurantGateway.existsById(id)){
-            throw new RestaurantNotFound("The restaurant doesn't exist.");
+            throw new RestaurantNotFoundException ("The restaurant doesn't exist.");
         }
 
         restaurantGateway.delete(id);
