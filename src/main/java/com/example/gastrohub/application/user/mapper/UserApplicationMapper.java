@@ -10,34 +10,34 @@ public class UserApplicationMapper {
     }
 
     public static User toDomain(CreateUserInput input) {
-        return new User(
-                null,
-                input.getName(),
-                input.getEmail(),
-                input.getLogin(),
-                input.getPassword(),
-                input.getRole()
-        );
+        return User.builder()
+                .name(input.getName())
+                .email(input.getEmail())
+                .login(input.getLogin())
+                .password(input.getPassword())
+                .role(input.getRole())
+                .build();
     }
 
     public static User toDomain(UpdateUserInput input) {
-        return new User(
-                input.getId(),
-                input.getName(),
-                input.getEmail(),
-                input.getLogin(),
-                input.getPassword(),
-                input.getRole()
-        );
+        return User.builder()
+                .id(input.getId())
+                .name(input.getName())
+                .email(input.getEmail())
+                .login(input.getLogin())
+                .password(input.getPassword())
+                .role(input.getRole())
+                .build();
     }
 
     public static UserOutput toOutput(User user) {
-        return new UserOutput(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getLogin(),
-                user.getRole().ordinal()
-        );
+        return UserOutput.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .email(user.getEmail())
+                .login(user.getLogin())
+                .role(user.getRole().ordinal())
+                .restaurants(user.getRestaurants())
+                .build();
     }
 }

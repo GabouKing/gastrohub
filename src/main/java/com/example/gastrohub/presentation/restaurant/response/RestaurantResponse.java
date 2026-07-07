@@ -1,16 +1,21 @@
 package com.example.gastrohub.presentation.restaurant.response;
 
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+@Builder
 @Schema(
         name = "RestaurantResponse",
         description = "Representa os dados de um restaurante."
 )
+@JsonInclude(JsonInclude.Include.NON_NULL)
+
 public class RestaurantResponse {
 
     @Schema(

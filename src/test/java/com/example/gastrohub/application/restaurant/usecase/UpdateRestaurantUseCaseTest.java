@@ -48,11 +48,13 @@ class UpdateRestaurantUseCaseTest {
         setId(restaurant, RESTAURANT_ID);
 
         request = new UpdateRestaurantInput(
+                1L,
                 "Burger House",
                 "456 Main Street",
                 CuisineType.BRAZILIAN,
                 "09:00-23:00",
-                10L
+                1L
+
         );
     }
 

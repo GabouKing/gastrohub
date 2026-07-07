@@ -1,11 +1,17 @@
 package com.example.gastrohub.presentation.user.response;
 
+import com.example.gastrohub.presentation.restaurant.response.RestaurantResponse;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
+@Builder
 @Schema(
         name = "UserResponse",
         description = "Representa os dados de um usuário."
@@ -48,4 +54,12 @@ public class UserResponse {
             example = "1"
     )
     private Integer role;
+
+    @ArraySchema(
+            schema = @Schema(implementation = RestaurantResponse.class),
+            arraySchema = @Schema(
+                    description = "Lista de restaurantes associados ao usuário."
+            )
+    )
+    private List<RestaurantResponse> restaurants;
 }

@@ -3,15 +3,13 @@ package com.example.gastrohub.presentation.user.request;
 import com.example.gastrohub.domain.user.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Schema(
         name = "UpdateUserRequest",
         description = "Dados necessários para atualizar um usuário."

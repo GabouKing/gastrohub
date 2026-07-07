@@ -26,6 +26,7 @@ public class RestaurantPersistenceMapper {
                 .cuisineType(entity.getCuisineType())
                 .openingHours(entity.getOpeningHours())
                 .userId(entity.getUser().getId())
+
                 .build();
     }
 }

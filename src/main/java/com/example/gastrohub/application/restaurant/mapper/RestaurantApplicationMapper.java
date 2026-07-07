@@ -8,35 +8,35 @@ import com.example.gastrohub.domain.restaurant.Restaurant;
 public class RestaurantApplicationMapper {
 
     public static Restaurant toDomain(CreateRestaurantInput createRestaurantInput) {
-        return new Restaurant(
-
-                createRestaurantInput.getName(),
-                createRestaurantInput.getAddress(),
-                createRestaurantInput.getCuisineType(),
-                createRestaurantInput.getOpeningHours(),
-                createRestaurantInput.getUserId()
-                );
+        return Restaurant.builder()
+                .name(createRestaurantInput.getName())
+                .address(createRestaurantInput.getAddress())
+                .cuisineType(createRestaurantInput.getCuisineType())
+                .openingHours(createRestaurantInput.getOpeningHours())
+                .userId(createRestaurantInput.getUserId())
+                .build();
     }
 
     public static Restaurant toDomain(UpdateRestaurantInput updateRestaurantInput) {
-        return new Restaurant(
-                updateRestaurantInput.getName(),
-                updateRestaurantInput.getAddress(),
-                updateRestaurantInput.getCuisineType(),
-                updateRestaurantInput.getOpeningHours(),
-                updateRestaurantInput.getUserId()
-        );
+        return Restaurant.builder()
+                .id(updateRestaurantInput.getId())
+                .name(updateRestaurantInput.getName())
+                .address(updateRestaurantInput.getAddress())
+                .cuisineType(updateRestaurantInput.getCuisineType())
+                .openingHours(updateRestaurantInput.getOpeningHours())
+                .userId(updateRestaurantInput.getUserId())
+                .build();
     }
 
     public static RestaurantOutput toOutput(Restaurant restaurant) {
-        return new RestaurantOutput(
-                restaurant.getId(),
-                restaurant.getName(),
-                restaurant.getAddress(),
-                restaurant.getCuisineType(),
-                restaurant.getOpeningHours(),
-                restaurant.getUserId()
-        );
+        return RestaurantOutput.builder()
+                .id(restaurant.getId())
+                .name(restaurant.getName())
+                .address(restaurant.getAddress())
+                .cuisineType(restaurant.getCuisineType())
+                .openingHours(restaurant.getOpeningHours())
+                .userId(restaurant.getUserId())
+                .build();
     }
 }
 
