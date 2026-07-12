@@ -15,13 +15,10 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info()
                         .title("GastroHub API")
-                        .description("API para gerenciamento de restaurantes, usuários e pedidos.")
-                        .version("1.0.0")
-                        .contact(new Contact()
-                                .name("João Marcos")
-                                .email("joao@email.com"))
-                        .license(new License()
-                                .name("MIT")));
+                        .version("2.0.0")
+                        .description("Sistema de gestão de usuários para plataforma compartilhada de restaurantes - Tech Challenge Fase 2.")
+                        .contact(new Contact().name("Equipe GastroHub"))
+                        .license(new License().name("Uso acadêmico")));
     }
 
 }
