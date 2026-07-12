@@ -96,7 +96,7 @@ class RestaurantControllerTest {
         given(findRestaurantByIdUseCase.execute(1L))
                 .willReturn(output());
 
-        mockMvc.perform(get(BASE_URL + "/id/{id}", 1L))
+        mockMvc.perform(get(BASE_URL + "/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Burger House"));

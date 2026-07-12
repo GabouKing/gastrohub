@@ -1,7 +1,7 @@
 package com.example.gastrohub.application.restaurant.usecase;
 
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
-import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,21 +47,21 @@ class DeleteRestaurantUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw RestaurantNotFound when restaurant does not exist")
-    void shouldThrowRestaurantNotFoundWhenRestaurantDoesNotExist() {
+    @DisplayName("Should throw RestaurantNotFoundException when restaurant does not exist")
+    void shouldThrowRestaurantNotFoundExceptionWhenRestaurantDoesNotExist() {
         // Arrange
         when(restaurantGateway.existsById(restaurantId))
                 .thenReturn(false);
 
         // Act
-        RestaurantNotFound exception = assertThrows(
-                RestaurantNotFound.class,
+        RestaurantNotFoundException exception = assertThrows(
+                RestaurantNotFoundException.class,
                 () -> deleteRestaurantUseCase.execute(restaurantId)
         );
 
         // Assert
         assertEquals(
-                "Restaurant not found: 1",
+                "The restaurant doesn't exist.",
                 exception.getMessage()
         );
 

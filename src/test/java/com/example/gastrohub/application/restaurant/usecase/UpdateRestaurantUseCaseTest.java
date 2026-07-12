@@ -4,7 +4,7 @@ import com.example.gastrohub.application.restaurant.dto.UpdateRestaurantInput;
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
-import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -87,14 +87,14 @@ class UpdateRestaurantUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw RestaurantNotFound when restaurant does not exist")
-    void shouldThrowRestaurantNotFoundWhenRestaurantDoesNotExist() {
+    @DisplayName("Should throw RestaurantNotFoundException when restaurant does not exist")
+    void shouldThrowRestaurantNotFoundExceptionWhenRestaurantDoesNotExist() {
 
         when(restaurantGateway.findById(RESTAURANT_ID))
                 .thenReturn(Optional.empty());
 
-        RestaurantNotFound exception = assertThrows(
-                RestaurantNotFound.class,
+        RestaurantNotFoundException exception = assertThrows(
+                RestaurantNotFoundException.class,
                 () -> updateRestaurantUseCase.execute(RESTAURANT_ID, request)
         );
 

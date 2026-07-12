@@ -14,6 +14,7 @@ import com.example.gastrohub.infra.persistence.role.mapper.RolePersistenceMapper
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,6 +46,14 @@ class PersistenceMappersTest {
     @Test
     void shouldMapRestaurantBetweenDomainAndEntity() {
         var mapper = new RestaurantPersistenceMapper();
+        var user = UserJpaEntity.builder()
+                .id(20L)
+                .name("Owner")
+                .email("owner@email.com")
+                .login("owner")
+                .password("123456")
+                .role(UserRole.USER_OWNER)
+                .build();
         var domain = new Restaurant(
                 1L,
                 "Burger House",
@@ -54,26 +63,28 @@ class PersistenceMappersTest {
                 20L
         );
 
-        var entity = mapper.toEntity(domain);
+        var entity = mapper.toEntity(domain, user);
         var mappedDomain = mapper.toDomain(entity);
 
         assertThat(entity.getId()).isEqualTo(1L);
-        assertThat(entity.getCuisineType()).isEqualTo("BRAZILIAN");
-        assertThat(entity.getOwnerId()).isEqualTo(20L);
+        assertThat(entity.getCuisineType()).isEqualTo(CuisineType.BRAZILIAN);
+        assertThat(entity.getUser().getId()).isEqualTo(20L);
         assertThat(mappedDomain.getName()).isEqualTo("Burger House");
         assertThat(mappedDomain.getCuisineType()).isEqualTo(CuisineType.BRAZILIAN);
+        assertThat(mappedDomain.getUserId()).isEqualTo(20L);
     }
 
     @Test
     void shouldMapUserBetweenDomainAndEntity() {
-        var mapper = new UserPersistenceMapper();
+        var mapper = new UserPersistenceMapper(new RestaurantPersistenceMapper());
         var domain = new User(
                 1L,
                 "Vinicius",
                 "vinicius@email.com",
                 "vinicius",
                 "123456",
-                UserRole.USER_OWNER
+                UserRole.USER_OWNER,
+                List.of()
         );
 
         var entity = mapper.toEntity(domain);
@@ -105,9 +116,14 @@ class PersistenceMappersTest {
         menuItemEntity.setName("Pizza");
         menuItemEntity.setRestaurantId(10L);
 
-        var restaurantEntity = new RestaurantJpaEntity();
-        restaurantEntity.setId(2L);
-        restaurantEntity.setName("Pizzaria Central");
+        var restaurantEntity = RestaurantJpaEntity.builder()
+                .id(2L)
+                .name("Pizzaria Central")
+                .address("Rua das Flores, 123")
+                .cuisineType(CuisineType.ITALIAN)
+                .openingHours("08:00-22:00")
+                .user(new UserJpaEntity())
+                .build();
 
         var userEntity = new UserJpaEntity();
         userEntity.setId(3L);

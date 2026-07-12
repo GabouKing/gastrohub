@@ -48,7 +48,7 @@ public class RestaurantController implements RestaurantControllerDocs {
 
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/name/{name}")
     @Override
     public ResponseEntity<RestaurantResponse> findRestaurantByName(@PathVariable String name) {
         var output = findRestaurantByNameUseCase.execute(name);

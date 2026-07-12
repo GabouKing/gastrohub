@@ -1,7 +1,7 @@
 package com.example.gastrohub.presentation.exception;
 
 import com.example.gastrohub.domain.menuitem.exception.MenuItemNotFound;
-import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException;
 import com.example.gastrohub.domain.role.exception.RoleNotFound;
 import com.example.gastrohub.domain.user.UserRole;
 import com.example.gastrohub.domain.user.exception.EmailAlreadyExistsException;
@@ -41,11 +41,11 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void shouldHandleRestaurantNotFound() {
-        var response = handler.handleRestaurantNotFound(new RestaurantNotFound(3L), request("/restaurants/3"));
+    void shouldHandleRestaurantNotFoundException() {
+        var response = handler.handleRestaurantNotFoundException(new RestaurantNotFoundException("Restaurant not found"), request("/restaurants/3"));
 
         assertProblem(response.getBody(), HttpStatus.NOT_FOUND, "Restaurant not found", "/problems/restaurant-not-found");
-        assertThat(response.getBody().getProperties()).containsEntry("invalid_value", 3L);
+        assertThat(response.getBody().getProperties()).isNull();
     }
 
     @Test
