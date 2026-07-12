@@ -38,7 +38,7 @@ public class RestaurantController implements RestaurantControllerDocs {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/id/{id}")
+    @GetMapping("/{id}")
     @Override
     public ResponseEntity<RestaurantResponse> findRestaurantById(@PathVariable Long id) {
         var output = findRestaurantByIdUseCase.execute(id);
@@ -48,7 +48,7 @@ public class RestaurantController implements RestaurantControllerDocs {
 
     }
 
-    @GetMapping("/name/{name}")
+    @GetMapping("/{name}")
     @Override
     public ResponseEntity<RestaurantResponse> findRestaurantByName(@PathVariable String name) {
         var output = findRestaurantByNameUseCase.execute(name);

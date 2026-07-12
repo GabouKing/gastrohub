@@ -25,4 +25,8 @@ public class User {
     public void changeEmail(String email) {
         this.email = email;
     }
+
+    public void changeRole(UserRole role) {
+        this.role = role;
+    }
 }
