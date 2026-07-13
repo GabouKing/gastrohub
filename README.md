@@ -83,8 +83,7 @@ Ativar perfil: `--spring.profiles.active=hml`
 ### Modelo relacional
 
 ```
-users (1) --- (N) restaurants (1) --- (N) menu_items
-roles (N)                              (roles são independentes)
+roles (1) --- (N) users (1) --- (N) restaurants (1) --- (N) menu_items
 ```
 
 ### users
@@ -96,7 +95,7 @@ roles (N)                              (roles são independentes)
 | email | VARCHAR(200) | NOT NULL, UNIQUE |
 | login | VARCHAR(50) | NOT NULL, UNIQUE |
 | password | VARCHAR(255) | NOT NULL |
-| role | VARCHAR(50) | NOT NULL, DEFAULT 'USER_CLIENT' |
+| role_id | BIGINT | FK → roles(id), NOT NULL |
 
 ### restaurants
 
@@ -107,7 +106,7 @@ roles (N)                              (roles são independentes)
 | address | VARCHAR(500) | NOT NULL |
 | cuisine_type | VARCHAR(100) | NOT NULL |
 | opening_hours | VARCHAR(200) | NOT NULL |
-| owner_id | BIGINT | FK → users(id), NOT NULL |
+| user_id | BIGINT | FK → users(id), NOT NULL |
 
 ### menu_items
 
@@ -248,15 +247,15 @@ Migrações em `src/main/resources/db/migration/`. Ativado apenas nos perfis `hm
 ./mvnw test
 ```
 
-Atualmente **47 testes**, todos passando:
-- Use cases Restaurant (8)
-- Use cases MenuItem (6)
-- Use cases User (6)
-- Use cases Role (12)
-- Domain Restaurant validation (11)
-- Smoke test (1)
-- User-Role vincul (2)
-- MenuItem CRUD (1)
+Atualmente **150 testes**, todos passando:
+- Use cases Restaurant
+- Use cases MenuItem
+- Use cases User
+- Use cases Role
+- Domain Restaurant validation
+- Smoke test
+- User-Role vínculo
+- MenuItem CRUD
 
 ---
 

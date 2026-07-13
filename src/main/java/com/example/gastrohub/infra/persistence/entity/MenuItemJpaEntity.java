@@ -13,6 +13,8 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 
@@ -32,6 +34,7 @@ public class MenuItemJpaEntity {
             nullable = false,
             foreignKey = @ForeignKey(name = "fk_menu_items_restaurant")
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private RestaurantJpaEntity restaurant;
 
     private String name;

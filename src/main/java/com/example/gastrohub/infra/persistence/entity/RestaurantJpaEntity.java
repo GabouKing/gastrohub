@@ -6,6 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "restaurants")
@@ -36,7 +41,16 @@ public class RestaurantJpaEntity {
                     name = "user_fk"
             )
     )
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserJpaEntity user;
 
+    @OneToMany(
+            mappedBy = "restaurant",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
+    private List<MenuItemJpaEntity> menuItems = new ArrayList<>();
 
 }

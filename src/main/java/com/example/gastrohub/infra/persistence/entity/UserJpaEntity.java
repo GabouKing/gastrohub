@@ -32,6 +32,12 @@ public class UserJpaEntity {
     )
     private RoleJpaEntity role;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.REMOVE,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
+    )
+    @Builder.Default
     private List<RestaurantJpaEntity> restaurants = new ArrayList<>();
 }
