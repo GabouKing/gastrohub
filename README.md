@@ -129,7 +129,7 @@ roles (1) --- (N) users (1) --- (N) restaurants (1) --- (N) menu_items
 | description | VARCHAR(255) | — |
 
 ---
-![alt text](image.png)
+![alt text](EER.png)
 
 ## Como executar
 
@@ -256,7 +256,8 @@ Atualmente **150 testes**, todos passando:
 - Smoke test
 - User-Role vínculo
 - MenuItem CRUD
-
+  
+![alt text](coverage.png)
 ---
 
 ## Acessos
