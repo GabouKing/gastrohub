@@ -2,13 +2,16 @@ package com.example.gastrohub.domain.restaurant;
 
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
 import com.example.gastrohub.domain.restaurant.exception.InvalidCuisineTypeException;
+import com.example.gastrohub.domain.restaurant.exception.InvalidOpeningHoursException;
 import com.example.gastrohub.domain.restaurant.exception.InvalidRestaurantAddressException;
 import com.example.gastrohub.domain.restaurant.exception.InvalidRestaurantNameException;
 import com.example.gastrohub.domain.restaurant.exception.InvalidUserException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 class RestaurantTest {
@@ -187,6 +190,104 @@ class RestaurantTest {
                         CuisineType.ITALIAN,
                         "08:00-22:00",
                         null
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Should throw InvalidOpeningHoursException when opening hours is null")
+    void shouldThrowInvalidOpeningHoursException_WhenOpeningHoursIsNull() {
+        assertThrowsExactly(
+                InvalidOpeningHoursException.class,
+                () -> new Restaurant(
+                        1L,
+                        "Bella Italia",
+                        "123 Main Street, Downtown",
+                        CuisineType.ITALIAN,
+                        null,
+                        10L
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Should throw InvalidOpeningHoursException when opening hours is blank")
+    void shouldThrowInvalidOpeningHoursException_WhenOpeningHoursIsBlank() {
+        assertThrowsExactly(
+                InvalidOpeningHoursException.class,
+                () -> new Restaurant(
+                        1L,
+                        "Bella Italia",
+                        "123 Main Street, Downtown",
+                        CuisineType.ITALIAN,
+                        "   ",
+                        10L
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Should throw InvalidOpeningHoursException when format is invalid")
+    void shouldThrowInvalidOpeningHoursException_WhenFormatIsInvalid() {
+        assertThrowsExactly(
+                InvalidOpeningHoursException.class,
+                () -> new Restaurant(
+                        1L,
+                        "Bella Italia",
+                        "123 Main Street, Downtown",
+                        CuisineType.ITALIAN,
+                        "25:00-22:00",
+                        10L
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("Should update restaurant when all fields are valid")
+    void shouldUpdateRestaurant_WhenAllFieldsAreValid() {
+        var restaurant = new Restaurant(
+                1L,
+                "Bella Italia",
+                "123 Main Street, Downtown",
+                CuisineType.ITALIAN,
+                "08:00-22:00",
+                10L
+        );
+
+        assertDoesNotThrow(() -> restaurant.update(
+                "Pizza House",
+                "456 Oak Avenue, Uptown",
+                CuisineType.JAPANESE,
+                "09:00-23:00"
+        ));
+
+        assertAll(
+                () -> assertEquals("Pizza House", restaurant.getName()),
+                () -> assertEquals("456 Oak Avenue, Uptown", restaurant.getAddress()),
+                () -> assertEquals(CuisineType.JAPANESE, restaurant.getCuisineType()),
+                () -> assertEquals("09:00-23:00", restaurant.getOpeningHours())
+        );
+    }
+
+    @Test
+    @DisplayName("Should throw InvalidOpeningHoursException when update with invalid hours")
+    void shouldThrowInvalidOpeningHoursException_WhenUpdateWithInvalidHours() {
+        var restaurant = new Restaurant(
+                1L,
+                "Bella Italia",
+                "123 Main Street, Downtown",
+                CuisineType.ITALIAN,
+                "08:00-22:00",
+                10L
+        );
+
+        assertThrowsExactly(
+                InvalidOpeningHoursException.class,
+                () -> restaurant.update(
+                        "Pizza House",
+                        "456 Oak Avenue, Uptown",
+                        CuisineType.JAPANESE,
+                        "invalid-hours"
                 )
         );
     }
