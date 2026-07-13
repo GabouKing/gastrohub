@@ -30,7 +30,7 @@ public class MenuItemRepositoryAdapter implements MenuItemGateway {
 
     @Override
     public List<MenuItem> findByRestaurantId(Long restaurantId) {
-        return repository.findByRestaurantId(restaurantId)
+        return repository.findByRestaurant_Id(restaurantId)
                 .stream()
                 .map(mapper::toDomain)
                 .toList();
