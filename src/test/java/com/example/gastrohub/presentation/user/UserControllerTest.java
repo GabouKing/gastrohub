@@ -2,14 +2,16 @@ package com.example.gastrohub.presentation.user;
 
 import com.example.gastrohub.application.user.dto.user.CreateUserInput;
 import com.example.gastrohub.application.user.dto.user.UpdateUserInput;
+import com.example.gastrohub.application.user.dto.user.UpdateUserRoleInput;
 import com.example.gastrohub.application.user.dto.user.UserOutput;
 import com.example.gastrohub.application.user.usecase.user.CreateUserUseCase;
 import com.example.gastrohub.application.user.usecase.user.DeleteUserUseCase;
 import com.example.gastrohub.application.user.usecase.user.FindUserByIdUseCase;
 import com.example.gastrohub.application.user.usecase.user.ListUserUseCase;
+import com.example.gastrohub.application.user.usecase.user.UpdateUserRoleUseCase;
 import com.example.gastrohub.application.user.usecase.user.UpdateUserUseCase;
-import com.example.gastrohub.domain.user.UserRole;
 import com.example.gastrohub.presentation.user.request.CreateUserRequest;
+import com.example.gastrohub.presentation.user.request.UpdateUserRoleRequest;
 import com.example.gastrohub.presentation.user.request.UpdateUserRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,7 @@ class UserControllerTest {
     private ListUserUseCase listUserUseCase;
     private FindUserByIdUseCase findUserByIdUseCase;
     private DeleteUserUseCase deleteUserUseCase;
+    private UpdateUserRoleUseCase updateUserRoleUseCase;
     private UserController controller;
 
     @BeforeEach
@@ -39,12 +42,14 @@ class UserControllerTest {
         listUserUseCase = mock(ListUserUseCase.class);
         findUserByIdUseCase = mock(FindUserByIdUseCase.class);
         deleteUserUseCase = mock(DeleteUserUseCase.class);
+        updateUserRoleUseCase = mock(UpdateUserRoleUseCase.class);
         controller = new UserController(
                 createUserUseCase,
                 updateUserUseCase,
                 listUserUseCase,
                 findUserByIdUseCase,
-                deleteUserUseCase
+                deleteUserUseCase,
+                updateUserRoleUseCase
         );
     }
 
@@ -55,7 +60,7 @@ class UserControllerTest {
                 "vinicius@email.com",
                 "vinicius",
                 "123456",
-                UserRole.USER_OWNER
+                3L
         );
         when(createUserUseCase.execute(org.mockito.ArgumentMatchers.any(CreateUserInput.class)))
                 .thenReturn(output());
@@ -68,7 +73,7 @@ class UserControllerTest {
 
         var captor = ArgumentCaptor.forClass(CreateUserInput.class);
         verify(createUserUseCase).execute(captor.capture());
-        assertThat(captor.getValue().getRole()).isEqualTo(UserRole.USER_OWNER);
+        assertThat(captor.getValue().getRoleId()).isEqualTo(3L);
     }
 
     @Test
@@ -78,7 +83,7 @@ class UserControllerTest {
                 "Vinicius",
                 "vinicius@email.com",
                 "vinicius",
-                UserRole.USER_OWNER,
+                3L,
                 "123456"
         );
         when(updateUserUseCase.execute(org.mockito.ArgumentMatchers.any(UpdateUserInput.class)))
@@ -104,7 +109,8 @@ class UserControllerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).hasSize(1);
-        assertThat(response.getBody().getFirst().getRole()).isEqualTo(UserRole.USER_OWNER.ordinal());
+        assertThat(response.getBody().getFirst().getRoleId()).isEqualTo(3L);
+        assertThat(response.getBody().getFirst().getRoleName()).isEqualTo("USER_OWNER");
         verify(listUserUseCase).execute();
     }
 
@@ -129,13 +135,29 @@ class UserControllerTest {
         verify(deleteUserUseCase).execute(1L);
     }
 
+    @Test
+    void shouldUpdateUserRole() {
+        var request = new UpdateUserRoleRequest(1L);
+
+        var response = controller.updateUserRole(1L, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNull();
+
+        var captor = ArgumentCaptor.forClass(UpdateUserRoleInput.class);
+        verify(updateUserRoleUseCase).execute(captor.capture());
+        assertThat(captor.getValue().getUserId()).isEqualTo(1L);
+        assertThat(captor.getValue().getRoleId()).isEqualTo(1L);
+    }
+
     private UserOutput output() {
         return new UserOutput(
                 1L,
                 "Vinicius",
                 "vinicius@email.com",
                 "vinicius",
-                UserRole.USER_OWNER.ordinal(),
+                3L,
+                "USER_OWNER",
                 List.of()
         );
     }

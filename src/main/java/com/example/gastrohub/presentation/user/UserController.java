@@ -1,11 +1,14 @@
 package com.example.gastrohub.presentation.user;
 
 import com.example.gastrohub.application.user.usecase.user.*;
+import com.example.gastrohub.application.user.dto.user.UpdateUserRoleInput;
 import com.example.gastrohub.presentation.user.docs.UserControllerDocs;
 import com.example.gastrohub.presentation.user.mapper.UserPresentationMapper;
 import com.example.gastrohub.presentation.user.request.CreateUserRequest;
+import com.example.gastrohub.presentation.user.request.UpdateUserRoleRequest;
 import com.example.gastrohub.presentation.user.request.UpdateUserRequest;
 import com.example.gastrohub.presentation.user.response.UserResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,7 @@ public class UserController implements UserControllerDocs {
     private final ListUserUseCase listUserUseCase;
     private final FindUserByIdUseCase  findUserByIdUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
+    private final UpdateUserRoleUseCase updateUserRoleUseCase;
 
     @PostMapping
     @Override
@@ -70,6 +74,17 @@ public class UserController implements UserControllerDocs {
     @Override
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         deleteUserUseCase.execute(id);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping("/{id}/role")
+    @Override
+    public ResponseEntity<?> updateUserRole(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserRoleRequest request
+    ) {
+        var input = new UpdateUserRoleInput(id, request.getRoleId());
+        updateUserRoleUseCase.execute(input);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -5,7 +5,6 @@ import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
 import com.example.gastrohub.domain.role.Role;
 import com.example.gastrohub.domain.user.User;
-import com.example.gastrohub.domain.user.UserRole;
 import com.example.gastrohub.infra.persistence.entity.MenuItemJpaEntity;
 import com.example.gastrohub.infra.persistence.entity.RestaurantJpaEntity;
 import com.example.gastrohub.infra.persistence.entity.UserJpaEntity;
@@ -52,7 +51,7 @@ class PersistenceMappersTest {
                 .email("owner@email.com")
                 .login("owner")
                 .password("123456")
-                .role(UserRole.USER_OWNER)
+                .role(new RoleJpaEntity(3L, "USER_OWNER", "Dono de restaurante"))
                 .build();
         var domain = new Restaurant(
                 1L,
@@ -76,14 +75,14 @@ class PersistenceMappersTest {
 
     @Test
     void shouldMapUserBetweenDomainAndEntity() {
-        var mapper = new UserPersistenceMapper(new RestaurantPersistenceMapper());
+        var mapper = new UserPersistenceMapper(new RestaurantPersistenceMapper(), new RolePersistenceMapper());
         var domain = new User(
                 1L,
                 "Vinicius",
                 "vinicius@email.com",
                 "vinicius",
                 "123456",
-                UserRole.USER_OWNER,
+                new Role(3L, "USER_OWNER", "Dono de restaurante"),
                 List.of()
         );
 
@@ -91,9 +90,11 @@ class PersistenceMappersTest {
         var mappedDomain = mapper.toDomain(entity);
 
         assertThat(entity.getId()).isEqualTo(1L);
-        assertThat(entity.getRole()).isEqualTo(UserRole.USER_OWNER);
+        assertThat(entity.getRole().getId()).isEqualTo(3L);
+        assertThat(entity.getRole().getName()).isEqualTo("USER_OWNER");
         assertThat(mappedDomain.getEmail()).isEqualTo("vinicius@email.com");
         assertThat(mappedDomain.getLogin()).isEqualTo("vinicius");
+        assertThat(mappedDomain.getRole().getName()).isEqualTo("USER_OWNER");
     }
 
     @Test

@@ -3,7 +3,6 @@ package com.example.gastrohub.presentation.exception;
 import com.example.gastrohub.domain.menuitem.exception.MenuItemNotFound;
 import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException;
 import com.example.gastrohub.domain.role.exception.RoleNotFound;
-import com.example.gastrohub.domain.user.UserRole;
 import com.example.gastrohub.domain.user.exception.EmailAlreadyExistsException;
 import com.example.gastrohub.domain.user.exception.UserNotFound;
 import com.example.gastrohub.presentation.user.request.CreateUserRequest;
@@ -123,7 +122,7 @@ class GlobalExceptionHandlerTest {
     private static class SampleController {
         @SuppressWarnings("unused")
         void create(CreateUserRequest request) {
-            request.setRole(UserRole.USER_CLIENT);
+            request.setRoleId(2L);
         }
     }
 }

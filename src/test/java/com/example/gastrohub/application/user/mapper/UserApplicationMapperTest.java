@@ -3,8 +3,8 @@ package com.example.gastrohub.application.user.mapper;
 import com.example.gastrohub.application.user.dto.user.CreateUserInput;
 import com.example.gastrohub.application.user.dto.user.UpdateUserInput;
 import com.example.gastrohub.application.user.dto.user.UserOutput;
+import com.example.gastrohub.domain.role.Role;
 import com.example.gastrohub.domain.user.User;
-import com.example.gastrohub.domain.user.UserRole;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -20,17 +20,18 @@ class UserApplicationMapperTest {
                 "vinicius@email.com",
                 "vinicius",
                 "123456",
-                UserRole.USER_OWNER
+                3L
         );
+        var role = ownerRole();
 
-        var user = UserApplicationMapper.toDomain(input);
+        var user = UserApplicationMapper.toDomain(input, role);
 
         assertThat(user.getId()).isNull();
         assertThat(user.getName()).isEqualTo("Vinicius");
         assertThat(user.getEmail()).isEqualTo("vinicius@email.com");
         assertThat(user.getLogin()).isEqualTo("vinicius");
         assertThat(user.getPassword()).isEqualTo("123456");
-        assertThat(user.getRole()).isEqualTo(UserRole.USER_OWNER);
+        assertThat(user.getRole()).isEqualTo(role);
     }
 
     @Test
@@ -41,13 +42,14 @@ class UserApplicationMapperTest {
                 "vinicius@email.com",
                 "vinicius",
                 "123456",
-                UserRole.USER_ADMIN
+                1L
         );
+        var role = adminRole();
 
-        var user = UserApplicationMapper.toDomain(input);
+        var user = UserApplicationMapper.toDomain(input, role);
 
         assertThat(user.getId()).isEqualTo(1L);
-        assertThat(user.getRole()).isEqualTo(UserRole.USER_ADMIN);
+        assertThat(user.getRole()).isEqualTo(role);
     }
 
     @Test
@@ -60,7 +62,8 @@ class UserApplicationMapperTest {
         assertThat(output.getName()).isEqualTo("Vinicius");
         assertThat(output.getEmail()).isEqualTo("vinicius@email.com");
         assertThat(output.getLogin()).isEqualTo("vinicius");
-        assertThat(output.getRole()).isEqualTo(UserRole.USER_OWNER.ordinal());
+        assertThat(output.getRoleId()).isEqualTo(3L);
+        assertThat(output.getRoleName()).isEqualTo("USER_OWNER");
     }
 
     @Test
@@ -68,7 +71,8 @@ class UserApplicationMapperTest {
         var output = UserOutput.from(user());
 
         assertThat(output.getId()).isEqualTo(1L);
-        assertThat(output.getRole()).isEqualTo(UserRole.USER_OWNER.ordinal());
+        assertThat(output.getRoleId()).isEqualTo(3L);
+        assertThat(output.getRoleName()).isEqualTo("USER_OWNER");
     }
 
     private User user() {
@@ -78,8 +82,16 @@ class UserApplicationMapperTest {
                 "vinicius@email.com",
                 "vinicius",
                 "123456",
-                UserRole.USER_OWNER,
+                ownerRole(),
                 List.of()
         );
+    }
+
+    private Role ownerRole() {
+        return new Role(3L, "USER_OWNER", "Dono de restaurante");
+    }
+
+    private Role adminRole() {
+        return new Role(1L, "USER_ADMIN", "Administrador");
     }
 }

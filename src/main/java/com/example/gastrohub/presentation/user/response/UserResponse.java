@@ -53,7 +53,8 @@ public class UserResponse {
                     """,
             example = "1"
     )
-    private Integer role;
+    private Long roleId;
+    private String roleName;
 
     @ArraySchema(
             schema = @Schema(implementation = RestaurantResponse.class),

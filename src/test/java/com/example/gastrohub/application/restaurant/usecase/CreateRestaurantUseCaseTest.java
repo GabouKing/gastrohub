@@ -7,9 +7,9 @@ import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
 import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException;
+import com.example.gastrohub.domain.role.Role;
 import com.example.gastrohub.domain.user.User;
 import com.example.gastrohub.domain.user.UserGateway;
-import com.example.gastrohub.domain.user.UserRole;
 import com.example.gastrohub.domain.user.exception.UserNotFound;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -163,7 +163,7 @@ class CreateRestaurantUseCaseTest {
                 "owner@email.com",
                 "owner",
                 "123456",
-                UserRole.USER_OWNER,
+                new Role(3L, "USER_OWNER", "Dono de restaurante"),
                 List.of()
         );
     }

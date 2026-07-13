@@ -20,7 +20,7 @@ public class UserPresentationMapper {
                 .email(request.getEmail())
                 .login(request.getLogin())
                 .password(request.getPassword())
-                .role(request.getRole())
+                .roleId(request.getRoleId())
                 .build();
     }
 
@@ -31,7 +31,7 @@ public class UserPresentationMapper {
                 .email(request.getEmail())
                 .login(request.getLogin())
                 .password(request.getPassword())
-                .role(request.getRole())
+                .roleId(request.getRoleId())
                 .build();
     }
 
@@ -41,7 +41,8 @@ public class UserPresentationMapper {
                 .name(output.getName())
                 .email(output.getEmail())
                 .login(output.getLogin())
-                .role(output.getRole())
+                .roleId(output.getRoleId())
+                .roleName(output.getRoleName())
                 .restaurants(
                         output.getRestaurants() == null
                                 ? List.of()

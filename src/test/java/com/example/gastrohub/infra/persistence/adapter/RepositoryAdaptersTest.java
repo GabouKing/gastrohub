@@ -5,7 +5,6 @@ import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
 import com.example.gastrohub.domain.role.Role;
 import com.example.gastrohub.domain.user.User;
-import com.example.gastrohub.domain.user.UserRole;
 import com.example.gastrohub.infra.persistence.entity.MenuItemJpaEntity;
 import com.example.gastrohub.infra.persistence.entity.RestaurantJpaEntity;
 import com.example.gastrohub.infra.persistence.entity.UserJpaEntity;
@@ -206,7 +205,7 @@ class RepositoryAdaptersTest {
                 "vinicius@email.com",
                 "vinicius",
                 "123456",
-                UserRole.USER_OWNER,
+                new Role(3L, "USER_OWNER", "Dono de restaurante"),
                 List.of()
         );
     }
@@ -218,7 +217,7 @@ class RepositoryAdaptersTest {
                 "vinicius@email.com",
                 "vinicius",
                 "123456",
-                UserRole.USER_OWNER,
+                new RoleJpaEntity(3L, "USER_OWNER", "Dono de restaurante"),
                 List.of()
         );
     }
