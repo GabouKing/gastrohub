@@ -1,6 +1,7 @@
 package com.example.gastrohub.domain.user;
 
 import com.example.gastrohub.domain.restaurant.Restaurant;
+import com.example.gastrohub.domain.role.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +18,7 @@ public class User {
     private String email;
     private String login;
     private String password;
-    private UserRole role;
+    private Role role;
 
     @Builder.Default
     private List<Restaurant> restaurants = new ArrayList<>();
@@ -26,7 +27,7 @@ public class User {
         this.email = email;
     }
 
-    public void changeRole(UserRole role) {
+    public void changeRole(Role role) {
         this.role = role;
     }
 }

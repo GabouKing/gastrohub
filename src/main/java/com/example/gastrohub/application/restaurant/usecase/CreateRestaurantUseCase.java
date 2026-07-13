@@ -8,7 +8,6 @@ import com.example.gastrohub.domain.restaurant.exception.RestaurantAlreadyExists
 import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException ;
 import com.example.gastrohub.domain.user.User;
 import com.example.gastrohub.domain.user.UserGateway;
-import com.example.gastrohub.domain.user.UserRole;
 import com.example.gastrohub.domain.user.exception.UserNotAllowedException;
 import com.example.gastrohub.domain.user.exception.UserNotFound;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,7 @@ public class CreateRestaurantUseCase {
         User user = userGateway.findById(createRestaurantInput.getUserId())
                 .orElseThrow(() -> new UserNotFound(createRestaurantInput.getUserId()));
 
-        if (user.getRole() != UserRole.USER_OWNER) {
+        if (user.getRole() == null || !"USER_OWNER".equals(user.getRole().getName())) {
             throw new UserNotAllowedException(
                     "Only users with USER_OWNER role can create restaurants."
             );

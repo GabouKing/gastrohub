@@ -1,6 +1,5 @@
 package com.example.gastrohub.application.user.dto.user;
 
-import com.example.gastrohub.domain.user.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UpdateUserRoleInput {
     private Long userId;
-    private UserRole role;
+    private Long roleId;
 }

@@ -2,7 +2,6 @@ package com.example.gastrohub.application.user.dto.user;
 
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.user.User;
-import com.example.gastrohub.domain.user.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +16,8 @@ public class UserOutput {
     private String name;
     private String email;
     private String login;
-    private Integer role;
+    private Long roleId;
+    private String roleName;
     private List<Restaurant>  restaurants;
 
     public static UserOutput from(User user) {
@@ -26,7 +26,8 @@ public class UserOutput {
                 .name(user.getName())
                 .email(user.getEmail())
                 .login(user.getLogin())
-                .role(user.getRole().ordinal())
+                .roleId(user.getRole() == null ? null : user.getRole().getId())
+                .roleName(user.getRole() == null ? null : user.getRole().getName())
                 .restaurants(user.getRestaurants())
                 .build();
     }

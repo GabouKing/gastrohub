@@ -21,6 +21,7 @@ import com.example.gastrohub.application.user.usecase.user.CreateUserUseCase;
 import com.example.gastrohub.application.user.usecase.user.DeleteUserUseCase;
 import com.example.gastrohub.application.user.usecase.user.FindUserByIdUseCase;
 import com.example.gastrohub.application.user.usecase.user.ListUserUseCase;
+import com.example.gastrohub.application.user.usecase.user.UpdateUserRoleUseCase;
 import com.example.gastrohub.application.user.usecase.user.UpdateUserUseCase;
 import com.example.gastrohub.domain.menuitem.exception.MenuItemNotFound;
 import com.example.gastrohub.domain.restaurant.exception.InvalidCuisineTypeException;
@@ -53,6 +54,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -85,6 +87,9 @@ class GlobalExceptionHandlerWebMvcIntegrationTest {
 
     @MockitoBean
     private DeleteUserUseCase deleteUserUseCase;
+
+    @MockitoBean
+    private UpdateUserRoleUseCase updateUserRoleUseCase;
 
     @MockitoBean
     private CreateRoleUseCase createRoleUseCase;
@@ -165,7 +170,7 @@ class GlobalExceptionHandlerWebMvcIntegrationTest {
                                 "email", "owner@gastrohub.com",
                                 "login", "owner",
                                 "password", "Senha@123",
-                                "role", "USER_OWNER"
+                                "roleId", 3
                         ))))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.type").value("/problems/email-already-exists"))
@@ -296,6 +301,21 @@ class GlobalExceptionHandlerWebMvcIntegrationTest {
                 .andExpect(jsonPath("$.instance").value("/roles"))
                 .andExpect(jsonPath("$.errors.name").value("Name is required"))
                 .andExpect(jsonPath("$.errors.description").value("Description must be at most 255 characters"));
+    }
+
+    @Test
+    @DisplayName("Should map user role validation errors to problem detail")
+    void shouldMapUserRoleValidationError() throws Exception {
+        mockMvc.perform(patch("/users/{id}/role", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of())))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.type").value("/problems/validation-error"))
+                .andExpect(jsonPath("$.title").value("Validation error"))
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.detail").value("One or more request fields are invalid"))
+                .andExpect(jsonPath("$.instance").value("/users/1/role"))
+                .andExpect(jsonPath("$.errors.roleId").value("Role is required"));
     }
 
     @Test

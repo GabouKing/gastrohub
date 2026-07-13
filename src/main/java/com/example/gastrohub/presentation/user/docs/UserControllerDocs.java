@@ -1,6 +1,7 @@
 package com.example.gastrohub.presentation.user.docs;
 
 import com.example.gastrohub.presentation.user.request.CreateUserRequest;
+import com.example.gastrohub.presentation.user.request.UpdateUserRoleRequest;
 import com.example.gastrohub.presentation.user.request.UpdateUserRequest;
 import com.example.gastrohub.presentation.user.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +32,7 @@ public interface UserControllerDocs {
                     - O e-mail deve ser válido e único.
                     - O login deve ser único.
                     - A senha deve atender aos requisitos de segurança.
-                    - O perfil (role) deve ser um valor válido.
+                    - O roleId deve referenciar um perfil existente.
                     """
     )
     @ApiResponses({
@@ -154,6 +155,33 @@ public interface UserControllerDocs {
                     example = "1"
             )
             Long id
+    );
+
+    // ----------------------------------------------------------------------
+
+    @Operation(
+            summary = "Atualizar perfil do usuário",
+            description = """
+                    Atualiza apenas o perfil de acesso de um usuário existente.
+
+                    O usuário deve existir e o perfil informado deve ser válido.
+                    """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Perfil atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados da requisição inválidos"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
+    ResponseEntity<?> updateUserRole(
+
+            @Parameter(
+                    description = "Identificador do usuário.",
+                    example = "1"
+            )
+            Long id,
+
+            UpdateUserRoleRequest request
     );
 }
 

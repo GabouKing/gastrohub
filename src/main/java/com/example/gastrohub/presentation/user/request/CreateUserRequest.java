@@ -1,6 +1,5 @@
 package com.example.gastrohub.presentation.user.request;
 
-import com.example.gastrohub.domain.user.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -74,8 +73,9 @@ public class CreateUserRequest {
 
     @Schema(
             description = "Perfil de acesso do usuário.",
-            example = "USER_OWNER"
+            example = "3"
     )
     @NotNull(message = "User role is required.")
-    private UserRole role;
+    @Positive(message = "User role must be greater than zero.")
+    private Long roleId;
 }

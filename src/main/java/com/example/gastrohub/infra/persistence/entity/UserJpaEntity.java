@@ -1,6 +1,6 @@
 package com.example.gastrohub.infra.persistence.entity;
 
-import com.example.gastrohub.domain.user.UserRole;
+import com.example.gastrohub.infra.persistence.role.entity.RoleJpaEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,8 +24,13 @@ public class UserJpaEntity {
     private String login;
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "role_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "user_role_fk")
+    )
+    private RoleJpaEntity role;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<RestaurantJpaEntity> restaurants = new ArrayList<>();

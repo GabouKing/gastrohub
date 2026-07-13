@@ -2,10 +2,10 @@ package com.example.gastrohub.infra.persistence.mapper;
 
 import com.example.gastrohub.domain.user.User;
 import com.example.gastrohub.infra.persistence.entity.UserJpaEntity;
+import com.example.gastrohub.infra.persistence.role.mapper.RolePersistenceMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -14,6 +14,7 @@ import java.util.List;
 public class UserPersistenceMapper {
 
     private final RestaurantPersistenceMapper restaurantPersistenceMapper;
+    private final RolePersistenceMapper rolePersistenceMapper;
 
     public UserJpaEntity toEntity(User user) {
         return UserJpaEntity.builder()
@@ -22,7 +23,7 @@ public class UserPersistenceMapper {
                 .email(user.getEmail())
                 .login(user.getLogin())
                 .password(user.getPassword())
-                .role(user.getRole())
+                .role(rolePersistenceMapper.toEntity(user.getRole()))
                 .build();
     }
 
@@ -33,7 +34,7 @@ public class UserPersistenceMapper {
                 .email(entity.getEmail())
                 .login(entity.getLogin())
                 .password(entity.getPassword())
-                .role(entity.getRole())
+                .role(rolePersistenceMapper.toDomain(entity.getRole()))
                 .restaurants(
                         entity.getRestaurants() == null
                                 ? List.of()

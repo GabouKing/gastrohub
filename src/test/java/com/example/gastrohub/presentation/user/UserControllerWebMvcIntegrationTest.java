@@ -5,8 +5,8 @@ import com.example.gastrohub.application.user.usecase.user.CreateUserUseCase;
 import com.example.gastrohub.application.user.usecase.user.DeleteUserUseCase;
 import com.example.gastrohub.application.user.usecase.user.FindUserByIdUseCase;
 import com.example.gastrohub.application.user.usecase.user.ListUserUseCase;
+import com.example.gastrohub.application.user.usecase.user.UpdateUserRoleUseCase;
 import com.example.gastrohub.application.user.usecase.user.UpdateUserUseCase;
-import com.example.gastrohub.domain.user.UserRole;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,7 @@ import static org.mockito.BDDMockito.doNothing;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -55,6 +56,9 @@ class UserControllerWebMvcIntegrationTest {
     @MockitoBean
     private DeleteUserUseCase deleteUserUseCase;
 
+    @MockitoBean
+    private UpdateUserRoleUseCase updateUserRoleUseCase;
+
     @Test
     @DisplayName("Should create user through MockMvc")
     void shouldCreateUser() throws Exception {
@@ -69,7 +73,8 @@ class UserControllerWebMvcIntegrationTest {
                 .andExpect(jsonPath("$.name").value("Owner User"))
                 .andExpect(jsonPath("$.email").value("owner@gastrohub.com"))
                 .andExpect(jsonPath("$.login").value("owner"))
-                .andExpect(jsonPath("$.role").value(UserRole.USER_OWNER.ordinal()))
+                .andExpect(jsonPath("$.roleId").value(3))
+                .andExpect(jsonPath("$.roleName").value("USER_OWNER"))
                 .andExpect(jsonPath("$.restaurants").isArray());
     }
 
@@ -119,13 +124,27 @@ class UserControllerWebMvcIntegrationTest {
                 .andExpect(content().string(""));
     }
 
+    @Test
+    @DisplayName("Should update user role through MockMvc")
+    void shouldUpdateUserRole() throws Exception {
+        doNothing().when(updateUserRoleUseCase).execute(any());
+
+        mockMvc.perform(patch("/users/{id}/role", 1L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json(Map.of("roleId", 1))))
+                .andExpect(status().isOk())
+                .andExpect(header().doesNotExist("Content-Type"))
+                .andExpect(content().string(""));
+    }
+
     private UserOutput userOutput() {
         return new UserOutput(
                 1L,
                 "Owner User",
                 "owner@gastrohub.com",
                 "owner",
-                UserRole.USER_OWNER.ordinal(),
+                3L,
+                "USER_OWNER",
                 List.of()
         );
     }
@@ -136,7 +155,7 @@ class UserControllerWebMvcIntegrationTest {
                 "email", "owner@gastrohub.com",
                 "login", "owner",
                 "password", "Senha@123",
-                "role", "USER_OWNER"
+                "roleId", 3
         ));
     }
 
