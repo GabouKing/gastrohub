@@ -130,6 +130,7 @@ roles (N)                              (roles são independentes)
 | description | VARCHAR(255) | — |
 
 ---
+![alt text](image.png)
 
 ## Como executar
 

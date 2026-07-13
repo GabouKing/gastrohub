@@ -43,7 +43,7 @@ class RepositoryAdaptersTest {
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toDomain(entity)).thenReturn(domain);
         when(repository.findById(1L)).thenReturn(Optional.of(entity));
-        when(repository.findByRestaurantId(10L)).thenReturn(List.of(entity));
+        when(repository.findByRestaurant_Id(10L)).thenReturn(List.of(entity));
 
         var saved = adapter.save(domain);
         var found = adapter.findById(1L);
@@ -54,7 +54,7 @@ class RepositoryAdaptersTest {
         assertThat(list).containsExactly(domain);
         verify(repository).save(entity);
         verify(repository).findById(1L);
-        verify(repository).findByRestaurantId(10L);
+        verify(repository).findByRestaurant_Id(10L);
     }
 
     @Test
