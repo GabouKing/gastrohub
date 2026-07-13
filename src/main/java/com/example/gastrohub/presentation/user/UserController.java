@@ -1,12 +1,11 @@
 package com.example.gastrohub.presentation.user;
 
 import com.example.gastrohub.application.user.usecase.user.*;
+import com.example.gastrohub.presentation.user.docs.UserControllerDocs;
 import com.example.gastrohub.presentation.user.mapper.UserPresentationMapper;
 import com.example.gastrohub.presentation.user.request.CreateUserRequest;
 import com.example.gastrohub.presentation.user.request.UpdateUserRequest;
-import com.example.gastrohub.presentation.user.request.UpdateUserRoleRequest;
 import com.example.gastrohub.presentation.user.response.UserResponse;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +16,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerDocs {
     private final CreateUserUseCase createUserUseCase;
     private final UpdateUserUseCase updateUserUseCase;
-    private final UpdateUserRoleUseCase updateUserRoleUseCase;
     private final ListUserUseCase listUserUseCase;
     private final FindUserByIdUseCase  findUserByIdUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
 
     @PostMapping
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest createUserRequest) {
+    @Override
+    public ResponseEntity<UserResponse> createUser(@RequestBody CreateUserRequest createUserRequest) {
         var input = UserPresentationMapper.toInput(createUserRequest);
         var output = createUserUseCase.execute(input);
         var response = UserPresentationMapper.toResponse(output);
@@ -35,9 +34,10 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
+    @Override
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
-            @Valid @RequestBody UpdateUserRequest updateUserRequest
+            @RequestBody UpdateUserRequest updateUserRequest
     ) {
         updateUserRequest.setId(id);
         var input = UserPresentationMapper.toInput(updateUserRequest);
@@ -48,6 +48,7 @@ public class UserController {
     }
 
     @GetMapping
+    @Override
     public ResponseEntity<List<UserResponse>> allUsers() {
         var response = listUserUseCase.execute()
                 .stream()
@@ -58,24 +59,16 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @Override
     public ResponseEntity<UserResponse> user(@PathVariable Long id) {
         var output = findUserByIdUseCase.execute(id);
         var response = UserPresentationMapper.toResponse(output);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PatchMapping("/{id}/role")
-    public ResponseEntity<Void> updateUserRole(
-            @PathVariable Long id,
-            @Valid @RequestBody UpdateUserRoleRequest request
-    ) {
-        var input = new com.example.gastrohub.application.user.dto.user.UpdateUserRoleInput(id, request.getRole());
-        updateUserRoleUseCase.execute(input);
-        return ResponseEntity.ok().build();
-    }
-
     @DeleteMapping("/{id}")
-    public ResponseEntity deleteUser(@PathVariable Long id) {
+    @Override
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         deleteUserUseCase.execute(id);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

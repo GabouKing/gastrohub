@@ -4,7 +4,7 @@ import com.example.gastrohub.application.menuitem.dto.menuitem.MenuItemOutput;
 import com.example.gastrohub.application.menuitem.mapper.MenuItemApplicationMapper;
 import com.example.gastrohub.domain.menuitem.MenuItemGateway;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
-import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class ListMenuItemsByRestaurantUseCase {
 
     public List<MenuItemOutput> execute(Long restaurantId) {
         if (!restaurantGateway.existsById(restaurantId)) {
-            throw new RestaurantNotFound(restaurantId);
+            throw new RestaurantNotFoundException(restaurantId.toString());
         }
 
         return menuItemGateway.findByRestaurantId(restaurantId)

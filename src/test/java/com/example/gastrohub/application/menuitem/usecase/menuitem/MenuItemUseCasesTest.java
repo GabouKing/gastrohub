@@ -5,7 +5,7 @@ import com.example.gastrohub.domain.menuitem.MenuItem;
 import com.example.gastrohub.domain.menuitem.MenuItemGateway;
 import com.example.gastrohub.domain.menuitem.exception.MenuItemNotFound;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
-import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -56,7 +56,7 @@ class MenuItemUseCasesTest {
         when(restaurantGateway.existsById(99L)).thenReturn(false);
 
         assertThrows(
-                RestaurantNotFound.class,
+                RestaurantNotFoundException.class,
                 () -> new ListMenuItemsByRestaurantUseCase(menuItemGateway, restaurantGateway).execute(99L)
         );
     }

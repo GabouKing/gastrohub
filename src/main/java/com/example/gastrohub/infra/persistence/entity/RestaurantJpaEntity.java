@@ -1,29 +1,42 @@
 package com.example.gastrohub.infra.persistence.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.example.gastrohub.domain.restaurant.enums.CuisineType;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "restaurants")
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Builder
 public class RestaurantJpaEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(name = "name", nullable = false, length = 100)
     private String name;
+    @Column(name = "address", nullable = false, length = 255)
     private String address;
-    private String cuisineType;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "cuisine_type", nullable = false, length = 50)
+    private CuisineType cuisineType;
+    @Column(name = "opening_hours", nullable = false, length = 100)
     private String openingHours;
-    private Long ownerId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            foreignKey = @ForeignKey(
+                    value = ConstraintMode.CONSTRAINT,
+                    name = "user_fk"
+            )
+    )
+    private UserJpaEntity user;
+
+
 }

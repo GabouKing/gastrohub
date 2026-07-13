@@ -1,13 +1,15 @@
 package com.example.gastrohub.application.restaurant.usecase;
 
-import com.example.gastrohub.application.restaurant.dto.CreateRestaurantRequest;
-import com.example.gastrohub.application.restaurant.dto.RestaurantResponse;
+import com.example.gastrohub.application.restaurant.dto.CreateRestaurantInput;
+import com.example.gastrohub.application.restaurant.dto.RestaurantOutput;
 import com.example.gastrohub.application.restaurant.mapper.RestaurantApplicationMapper;
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
-import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException;
+import com.example.gastrohub.domain.user.User;
 import com.example.gastrohub.domain.user.UserGateway;
+import com.example.gastrohub.domain.user.UserRole;
 import com.example.gastrohub.domain.user.exception.UserNotFound;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,8 +20,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,12 +40,12 @@ class CreateRestaurantUseCaseTest {
     @InjectMocks
     private CreateRestaurantUseCase createRestaurantUseCase;
 
-    private CreateRestaurantRequest request;
+    private CreateRestaurantInput request;
     private Restaurant restaurant;
 
     @BeforeEach
     void setUp() {
-        request = new CreateRestaurantRequest(
+        request = new CreateRestaurantInput(
                 "Pizza House",
                 "123 Main Street",
                 CuisineType.ITALIAN,
@@ -56,6 +62,8 @@ class CreateRestaurantUseCaseTest {
         // Arrange
         when(userGateway.existsById(request.getUserId()))
                 .thenReturn(true);
+        when(userGateway.findById(request.getUserId()))
+                .thenReturn(Optional.of(owner()));
 
         when(restaurantGateway.existsByName(request.getName()))
                 .thenReturn(false);
@@ -64,7 +72,7 @@ class CreateRestaurantUseCaseTest {
                 .thenReturn(restaurant);
 
         // Act
-        RestaurantResponse response = createRestaurantUseCase.execute(request);
+        RestaurantOutput response = createRestaurantUseCase.execute(request);
 
         // Assert
         assertNotNull(response);
@@ -72,8 +80,9 @@ class CreateRestaurantUseCaseTest {
         ArgumentCaptor<Restaurant> captor =
                 ArgumentCaptor.forClass(Restaurant.class);
 
+        verify(userGateway).findById(request.getUserId());
         verify(userGateway).existsById(request.getUserId());
-        verify(restaurantGateway).existsByName(request.getName());
+        verify(restaurantGateway, times(2)).existsByName(request.getName());
         verify(restaurantGateway).save(captor.capture());
 
         Restaurant savedRestaurant = captor.getValue();
@@ -93,8 +102,8 @@ class CreateRestaurantUseCaseTest {
     @DisplayName("Should throw UserNotFound when owner does not exist")
     void shouldThrowUserNotFoundWhenOwnerDoesNotExist() {
         // Arrange
-        when(userGateway.existsById(request.getUserId()))
-                .thenReturn(false);
+        when(userGateway.findById(request.getUserId()))
+                .thenReturn(Optional.empty());
 
         // Act
         UserNotFound exception = assertThrows(
@@ -108,7 +117,7 @@ class CreateRestaurantUseCaseTest {
                 exception.getMessage()
         );
 
-        verify(userGateway).existsById(request.getUserId());
+        verify(userGateway).findById(request.getUserId());
         verify(restaurantGateway, never()).existsByName(any());
         verify(restaurantGateway, never()).save(any());
 
@@ -116,18 +125,20 @@ class CreateRestaurantUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw RestaurantNotFound when restaurant name already exists")
-    void shouldThrowRestaurantNotFoundWhenRestaurantNameAlreadyExists() {
+    @DisplayName("Should throw RestaurantNotFoundException when restaurant name already exists")
+    void shouldThrowRestaurantNotFoundExceptionWhenRestaurantNameAlreadyExists() {
         // Arrange
         when(userGateway.existsById(request.getUserId()))
                 .thenReturn(true);
+        when(userGateway.findById(request.getUserId()))
+                .thenReturn(Optional.of(owner()));
 
         when(restaurantGateway.existsByName(request.getName()))
                 .thenReturn(true);
 
         // Act
-        RestaurantNotFound exception = assertThrows(
-                RestaurantNotFound.class,
+        RestaurantNotFoundException exception = assertThrows(
+                RestaurantNotFoundException.class,
                 () -> createRestaurantUseCase.execute(request)
         );
 
@@ -137,10 +148,23 @@ class CreateRestaurantUseCaseTest {
                 exception.getMessage()
         );
 
+        verify(userGateway).findById(request.getUserId());
         verify(userGateway).existsById(request.getUserId());
         verify(restaurantGateway).existsByName(request.getName());
         verify(restaurantGateway, never()).save(any());
 
         verifyNoMoreInteractions(userGateway, restaurantGateway);
+    }
+
+    private User owner() {
+        return new User(
+                request.getUserId(),
+                "Owner",
+                "owner@email.com",
+                "owner",
+                "123456",
+                UserRole.USER_OWNER,
+                List.of()
+        );
     }
 }

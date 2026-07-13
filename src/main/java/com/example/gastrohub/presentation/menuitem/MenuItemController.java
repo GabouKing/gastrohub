@@ -5,6 +5,7 @@ import com.example.gastrohub.application.menuitem.usecase.menuitem.DeleteMenuIte
 import com.example.gastrohub.application.menuitem.usecase.menuitem.FindMenuItemByIdUseCase;
 import com.example.gastrohub.application.menuitem.usecase.menuitem.ListMenuItemsByRestaurantUseCase;
 import com.example.gastrohub.application.menuitem.usecase.menuitem.UpdateMenuItemUseCase;
+import com.example.gastrohub.presentation.menuitem.docs.MenuItemControllerDocs;
 import com.example.gastrohub.presentation.menuitem.mapper.MenuItemPresentationMapper;
 import com.example.gastrohub.presentation.menuitem.request.CreateMenuItemRequest;
 import com.example.gastrohub.presentation.menuitem.request.UpdateMenuItemRequest;
@@ -25,7 +26,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-public class MenuItemController {
+public class MenuItemController implements MenuItemControllerDocs {
     private final CreateMenuItemUseCase createMenuItemUseCase;
     private final ListMenuItemsByRestaurantUseCase listMenuItemsByRestaurantUseCase;
     private final FindMenuItemByIdUseCase findMenuItemByIdUseCase;
@@ -33,6 +34,7 @@ public class MenuItemController {
     private final DeleteMenuItemUseCase deleteMenuItemUseCase;
 
     @PostMapping("/restaurants/{restaurantId}/menu-items")
+    @Override
     public ResponseEntity<MenuItemResponse> createMenuItem(
             @PathVariable Long restaurantId,
             @Valid @RequestBody CreateMenuItemRequest request
@@ -45,6 +47,7 @@ public class MenuItemController {
     }
 
     @GetMapping("/restaurants/{restaurantId}/menu-items")
+    @Override
     public ResponseEntity<List<MenuItemResponse>> listMenuItemsByRestaurant(@PathVariable Long restaurantId) {
         var response = listMenuItemsByRestaurantUseCase.execute(restaurantId)
                 .stream()
@@ -55,6 +58,7 @@ public class MenuItemController {
     }
 
     @GetMapping("/menu-items/{id}")
+    @Override
     public ResponseEntity<MenuItemResponse> findMenuItemById(@PathVariable Long id) {
         var output = findMenuItemByIdUseCase.execute(id);
         var response = MenuItemPresentationMapper.toResponse(output);
@@ -63,6 +67,7 @@ public class MenuItemController {
     }
 
     @PutMapping("/menu-items/{id}")
+    @Override
     public ResponseEntity<MenuItemResponse> updateMenuItem(
             @PathVariable Long id,
             @Valid @RequestBody UpdateMenuItemRequest request
@@ -75,6 +80,7 @@ public class MenuItemController {
     }
 
     @DeleteMapping("/menu-items/{id}")
+    @Override
     public ResponseEntity<Void> deleteMenuItem(@PathVariable Long id) {
         deleteMenuItemUseCase.execute(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

@@ -1,10 +1,10 @@
 package com.example.gastrohub.application.restaurant.usecase;
 
-import com.example.gastrohub.application.restaurant.dto.RestaurantResponse;
+import com.example.gastrohub.application.restaurant.dto.RestaurantOutput;
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
-import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ class FindRestaurantByNameUseCaseTest {
                 .thenReturn(Optional.of(restaurant));
 
         // Act
-        RestaurantResponse response =
+        RestaurantOutput response =
                 findRestaurantByNameUseCase.execute(restaurantName);
 
         // Assert
@@ -76,15 +76,15 @@ class FindRestaurantByNameUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw RestaurantNotFound when restaurant does not exist")
-    void shouldThrowRestaurantNotFoundWhenRestaurantDoesNotExist() {
+    @DisplayName("Should throw RestaurantNotFoundException when restaurant does not exist")
+    void shouldThrowRestaurantNotFoundExceptionWhenRestaurantDoesNotExist() {
         // Arrange
         when(restaurantGateway.findByName(restaurantName))
                 .thenReturn(Optional.empty());
 
         // Act
-        RestaurantNotFound exception = assertThrows(
-                RestaurantNotFound.class,
+        RestaurantNotFoundException exception = assertThrows(
+                RestaurantNotFoundException.class,
                 () -> findRestaurantByNameUseCase.execute(restaurantName)
         );
 

@@ -1,6 +1,6 @@
 package com.example.gastrohub.application.restaurant.usecase;
 
-import com.example.gastrohub.application.restaurant.dto.RestaurantResponse;
+import com.example.gastrohub.application.restaurant.dto.RestaurantOutput;
 import com.example.gastrohub.domain.restaurant.Restaurant;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
 import com.example.gastrohub.domain.restaurant.enums.CuisineType;
@@ -50,7 +50,7 @@ class ListRestaurantsUseCaseTest {
                 .thenReturn(List.of(restaurant));
 
         // Act
-        List<RestaurantResponse> response = listRestaurantsUseCase.execute();
+        List<RestaurantOutput> response = listRestaurantsUseCase.execute();
 
         // Assert
         assertAll(
@@ -76,7 +76,7 @@ class ListRestaurantsUseCaseTest {
                 .thenReturn(List.of());
 
         // Act
-        List<RestaurantResponse> response = listRestaurantsUseCase.execute();
+        List<RestaurantOutput> response = listRestaurantsUseCase.execute();
 
         // Assert
         assertNotNull(response);

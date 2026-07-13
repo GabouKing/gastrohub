@@ -7,6 +7,8 @@ import com.example.gastrohub.domain.user.User;
 import com.example.gastrohub.domain.user.UserRole;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserApplicationMapperTest {
@@ -58,7 +60,7 @@ class UserApplicationMapperTest {
         assertThat(output.getName()).isEqualTo("Vinicius");
         assertThat(output.getEmail()).isEqualTo("vinicius@email.com");
         assertThat(output.getLogin()).isEqualTo("vinicius");
-        assertThat(output.getRole()).isEqualTo("USER_OWNER");
+        assertThat(output.getRole()).isEqualTo(UserRole.USER_OWNER.ordinal());
     }
 
     @Test
@@ -66,7 +68,7 @@ class UserApplicationMapperTest {
         var output = UserOutput.from(user());
 
         assertThat(output.getId()).isEqualTo(1L);
-        assertThat(output.getRole()).isEqualTo("USER_OWNER");
+        assertThat(output.getRole()).isEqualTo(UserRole.USER_OWNER.ordinal());
     }
 
     private User user() {
@@ -76,7 +78,8 @@ class UserApplicationMapperTest {
                 "vinicius@email.com",
                 "vinicius",
                 "123456",
-                UserRole.USER_OWNER
+                UserRole.USER_OWNER,
+                List.of()
         );
     }
 }

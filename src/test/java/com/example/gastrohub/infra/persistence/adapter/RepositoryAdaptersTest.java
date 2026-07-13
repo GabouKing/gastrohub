@@ -71,12 +71,15 @@ class RepositoryAdaptersTest {
     @Test
     void shouldSaveFindListAndDeleteRestaurant() {
         var repository = mock(RestaurantJpaRepository.class);
+        var userRepository = mock(UserJpaRepository.class);
         var mapper = mock(RestaurantPersistenceMapper.class);
-        var adapter = new RestaurantRepositoryAdapter(repository, mapper);
+        var adapter = new RestaurantRepositoryAdapter(repository, userRepository, mapper);
         var domain = restaurant();
         var entity = restaurantEntity();
+        var userEntity = userEntity();
 
-        when(mapper.toEntity(domain)).thenReturn(entity);
+        when(userRepository.findById(20L)).thenReturn(Optional.of(userEntity));
+        when(mapper.toEntity(domain, userEntity)).thenReturn(entity);
         when(repository.save(entity)).thenReturn(entity);
         when(mapper.toDomain(entity)).thenReturn(domain);
         when(repository.findById(1L)).thenReturn(Optional.of(entity));
@@ -186,14 +189,14 @@ class RepositoryAdaptersTest {
     }
 
     private RestaurantJpaEntity restaurantEntity() {
-        return new RestaurantJpaEntity(
-                1L,
-                "Burger House",
-                "Rua das Flores, 123",
-                "BRAZILIAN",
-                "08:00-22:00",
-                20L
-        );
+        return RestaurantJpaEntity.builder()
+                .id(1L)
+                .name("Burger House")
+                .address("Rua das Flores, 123")
+                .cuisineType(CuisineType.BRAZILIAN)
+                .openingHours("08:00-22:00")
+                .user(userEntity())
+                .build();
     }
 
     private User user() {
@@ -203,7 +206,8 @@ class RepositoryAdaptersTest {
                 "vinicius@email.com",
                 "vinicius",
                 "123456",
-                UserRole.USER_OWNER
+                UserRole.USER_OWNER,
+                List.of()
         );
     }
 
@@ -214,7 +218,8 @@ class RepositoryAdaptersTest {
                 "vinicius@email.com",
                 "vinicius",
                 "123456",
-                UserRole.USER_OWNER
+                UserRole.USER_OWNER,
+                List.of()
         );
     }
 }

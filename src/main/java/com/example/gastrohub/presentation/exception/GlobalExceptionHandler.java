@@ -1,7 +1,7 @@
 package com.example.gastrohub.presentation.exception;
 
+import com.example.gastrohub.domain.restaurant.exception.*;
 import com.example.gastrohub.domain.menuitem.exception.MenuItemNotFound;
-import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
 import com.example.gastrohub.domain.role.exception.RoleNotFound;
 import com.example.gastrohub.domain.user.exception.EmailAlreadyExistsException;
 import com.example.gastrohub.domain.user.exception.UserNotFound;
@@ -48,21 +48,6 @@ public class GlobalExceptionHandler {
                 "/problems/menu-item-not-found",
                 request,
                 exception.getMenuItemId()
-        );
-    }
-
-    @ExceptionHandler(RestaurantNotFound.class)
-    public ResponseEntity<ProblemDetail> handleRestaurantNotFound(
-            RestaurantNotFound exception,
-            HttpServletRequest request
-    ) {
-        return buildResponse(
-                HttpStatus.NOT_FOUND,
-                "Restaurant not found",
-                "The requested restaurant was not found.",
-                "/problems/restaurant-not-found",
-                request,
-                exception.getRestaurantId()
         );
     }
 
@@ -116,6 +101,113 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
+
+    @ExceptionHandler(InvalidCuisineTypeException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidCuisineTypeException(
+            InvalidCuisineTypeException exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                "Invalid cuisine type",
+                exception.getMessage(),
+                "/problems/invalid-cuisine-type",
+                request,
+                null
+        );
+    }
+
+    @ExceptionHandler(InvalidOpeningHoursException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidOpeningHoursException(
+            InvalidOpeningHoursException exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                "Invalid opening hours",
+                exception.getMessage(),
+                "/problems/invalid-opening-hours",
+                request,
+                null
+        );
+    }
+
+    @ExceptionHandler(InvalidRestaurantAddressException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidRestaurantAddressException(
+            InvalidRestaurantAddressException exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                "Invalid restaurant address",
+                exception.getMessage(),
+                "/problems/invalid-restaurant-address",
+                request,
+                null
+        );
+    }
+
+    @ExceptionHandler(InvalidRestaurantNameException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidRestaurantNameException(
+            InvalidRestaurantNameException exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                "Invalid restaurant name",
+                exception.getMessage(),
+                "/problems/invalid-restaurant-name",
+                request,
+                null
+        );
+    }
+
+    @ExceptionHandler(InvalidUserException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidUserException(
+            InvalidUserException exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.BAD_REQUEST,
+                "Invalid user",
+                exception.getMessage(),
+                "/problems/invalid-user",
+                request,
+                null
+        );
+    }
+
+    @ExceptionHandler(RestaurantAlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> handleRestaurantAlreadyExistsException(
+            RestaurantAlreadyExistsException exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.CONFLICT,
+                "Restaurant already exists",
+                exception.getMessage(),
+                "/problems/restaurant-already-exists",
+                request,
+                null
+        );
+    }
+
+    @ExceptionHandler(RestaurantNotFoundException .class)
+    public ResponseEntity<ProblemDetail> handleRestaurantNotFoundException(
+            RestaurantNotFoundException  exception,
+            HttpServletRequest request
+    ) {
+        return buildResponse(
+                HttpStatus.NOT_FOUND,
+                "Restaurant not found",
+                exception.getMessage(),
+                "/problems/restaurant-not-found",
+                request,
+                null
+        );
+    }
+
+
 
     @ExceptionHandler({
             HttpMessageNotReadableException.class,

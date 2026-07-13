@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -32,7 +33,7 @@ class UpdateUserRoleUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        user = new User(1L, "John", "john@email.com", "john", "123456", UserRole.USER_CLIENT);
+        user = new User(1L, "John", "john@email.com", "john", "123456", UserRole.USER_CLIENT, List.of());
         input = new UpdateUserRoleInput(1L, UserRole.USER_ADMIN);
     }
 

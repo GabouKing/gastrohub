@@ -5,7 +5,7 @@ import com.example.gastrohub.application.menuitem.dto.menuitem.MenuItemOutput;
 import com.example.gastrohub.application.menuitem.mapper.MenuItemApplicationMapper;
 import com.example.gastrohub.domain.menuitem.MenuItemGateway;
 import com.example.gastrohub.domain.restaurant.RestaurantGateway;
-import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFound;
+import com.example.gastrohub.domain.restaurant.exception.RestaurantNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,7 +20,7 @@ public class CreateMenuItemUseCase {
 
     public MenuItemOutput execute(CreateMenuItemInput input) {
         if (!restaurantGateway.existsById(input.getRestaurantId())) {
-            throw new RestaurantNotFound(input.getRestaurantId());
+            throw new RestaurantNotFoundException(input.getRestaurantId().toString());
         }
 
         var menuItem = MenuItemApplicationMapper.toDomain(input);
