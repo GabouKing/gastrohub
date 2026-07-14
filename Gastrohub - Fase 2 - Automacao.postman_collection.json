@@ -1,0 +1,1438 @@
+﻿{
+    "info":  {
+                 "_postman_id":  "a48a6890-9675-405a-9a47-7f93e1c828b3",
+                 "name":  "Gastrohub - Fase 2 - Automacao",
+                 "description":  "Collection automatizada para validar fluxos de sucesso, erros tratados e cascade delete do GastroHub.",
+                 "schema":  "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+             },
+    "variable":  [
+                     {
+                         "key":  "baseUrl",
+                         "value":  "http://localhost:8080"
+                     },
+                     {
+                         "key":  "missingId",
+                         "value":  "999999999"
+                     }
+                 ],
+    "item":  [
+                 {
+                     "name":  "00 - Start / Find USER_OWNER Role",
+                     "event":  [
+                                   {
+                                       "listen":  "prerequest",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "const runId = Date.now().toString();",
+                                                                   "pm.collectionVariables.set(\u0027runId\u0027, runId);",
+                                                                   "[\u0027ownerRoleId\u0027, \u0027clientRoleId\u0027, \u0027ownerUserId\u0027, \u0027clientUserId\u0027, \u0027restaurantId\u0027, \u0027menuItemId\u0027, \u0027cascadeRestaurantId\u0027, \u0027cascadeMenuItemId\u0027, \u0027cascadeUserId\u0027, \u0027cascadeUserRestaurantId\u0027, \u0027cascadeUserMenuItemId\u0027].forEach(key =\u003e pm.collectionVariables.unset(key));",
+                                                                   "pm.collectionVariables.set(\u0027ownerEmail\u0027, `owner.${runId}@gastrohub.test`);",
+                                                                   "pm.collectionVariables.set(\u0027clientEmail\u0027, `client.${runId}@gastrohub.test`);",
+                                                                   "pm.collectionVariables.set(\u0027cascadeEmail\u0027, `cascade.${runId}@gastrohub.test`);"
+                                                               ]
+                                                  }
+                                   },
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027GET /roles returns 200\u0027, function () { pm.response.to.have.status(200); });",
+                                                                   "const roles = pm.response.json();",
+                                                                   "const ownerRole = roles.find(role =\u003e role.name === \u0027USER_OWNER\u0027);",
+                                                                   "if (ownerRole) {",
+                                                                   "  pm.collectionVariables.set(\u0027ownerRoleId\u0027, ownerRole.id);",
+                                                                   "  postman.setNextRequest(\u002702 - Create CLIENT Role\u0027);",
+                                                                   "} else {",
+                                                                   "  postman.setNextRequest(\u002701 - Create OWNER Role\u0027);",
+                                                                   "}"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/roles",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "roles"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "01 - Create OWNER Role",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027OWNER role created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.collectionVariables.set(\u0027ownerRoleId\u0027, body.id);"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"USER_OWNER\",\n  \"description\": \"Dono de restaurante\"\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/roles",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "roles"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "02 - Create CLIENT Role",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027CLIENT role created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.collectionVariables.set(\u0027clientRoleId\u0027, body.id);"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"USER_CLIENT_AUTO_{{runId}}\",\n  \"description\": \"Cliente criado pela collection automatizada\"\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/roles",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "roles"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "03 - Create Owner User",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Owner user created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.collectionVariables.set(\u0027ownerUserId\u0027, body.id);",
+                                                                   "pm.test(\u0027Owner user has USER_OWNER role\u0027, function () { pm.expect(body.roleName).to.eql(\u0027USER_OWNER\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Owner Auto {{runId}}\",\n  \"email\": \"{{ownerEmail}}\",\n  \"login\": \"owner{{runId}}\",\n  \"password\": \"Senha@123\",\n  \"roleId\": {{ownerRoleId}}\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/users",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "users"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "04 - Create Client User",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Client user created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.collectionVariables.set(\u0027clientUserId\u0027, body.id);"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Client Auto {{runId}}\",\n  \"email\": \"{{clientEmail}}\",\n  \"login\": \"client{{runId}}\",\n  \"password\": \"Senha@123\",\n  \"roleId\": {{clientRoleId}}\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/users",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "users"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "05 - Error Duplicate User Email",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Duplicate email returns 409\u0027, function () { pm.response.to.have.status(409); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027ProblemDetail title is Email already exists\u0027, function () { pm.expect(body.title).to.eql(\u0027Email already exists\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Owner Duplicate {{runId}}\",\n  \"email\": \"{{ownerEmail}}\",\n  \"login\": \"ownerduplicate{{runId}}\",\n  \"password\": \"Senha@123\",\n  \"roleId\": {{ownerRoleId}}\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/users",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "users"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "06 - Error User Not Found",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Missing user returns 404\u0027, function () { pm.response.to.have.status(404); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027ProblemDetail title is User not found\u0027, function () { pm.expect(body.title).to.eql(\u0027User not found\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/users/{{missingId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "users",
+                                                              "{{missingId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "07 - Error Restaurant Invalid Cuisine",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Invalid enum returns 400\u0027, function () { pm.response.to.have.status(400); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027ProblemDetail title is Invalid request data\u0027, function () { pm.expect(body.title).to.eql(\u0027Invalid request data\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Invalid Cuisine {{runId}}\",\n  \"address\": \"Rua das Palmeiras, 123, Centro\",\n  \"cuisineType\": \"ITALI222AN\",\n  \"openingHours\": \"08:00-22:00\",\n  \"userId\": {{ownerUserId}}\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "08 - Error Restaurant Invalid Opening Hours",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Invalid opening hours returns 400\u0027, function () { pm.response.to.have.status(400); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027ProblemDetail title is Validation error\u0027, function () { pm.expect(body.title).to.eql(\u0027Validation error\u0027); });",
+                                                                   "pm.test(\u0027Errors contains openingHours\u0027, function () { pm.expect(body.errors).to.have.property(\u0027openingHours\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Invalid Hours {{runId}}\",\n  \"address\": \"Rua das Palmeiras, 123, Centro\",\n  \"cuisineType\": \"ITALIAN\",\n  \"openingHours\": \"25:00-99:00\",\n  \"userId\": {{ownerUserId}}\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "09 - Create Restaurant",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Restaurant created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.collectionVariables.set(\u0027restaurantId\u0027, body.id);",
+                                                                   "pm.test(\u0027Restaurant belongs to owner user\u0027, function () { pm.expect(body.userId).to.eql(Number(pm.collectionVariables.get(\u0027ownerUserId\u0027))); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Pizzaria Auto {{runId}}\",\n  \"address\": \"Rua das Palmeiras, 123, Centro\",\n  \"cuisineType\": \"ITALIAN\",\n  \"openingHours\": \"08:00-22:00\",\n  \"userId\": {{ownerUserId}}\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "10 - List Restaurants",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027List restaurants returns 200\u0027, function () { pm.response.to.have.status(200); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027Response is an array\u0027, function () { pm.expect(body).to.be.an(\u0027array\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "11 - Get Restaurant By Id",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Get restaurant returns 200\u0027, function () { pm.response.to.have.status(200); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027Restaurant id matches\u0027, function () { pm.expect(body.id).to.eql(Number(pm.collectionVariables.get(\u0027restaurantId\u0027))); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{restaurantId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{restaurantId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "12 - Update Restaurant",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Update restaurant returns 200\u0027, function () { pm.response.to.have.status(200); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027Restaurant name was updated\u0027, function () { pm.expect(body.name).to.include(\u0027Atualizada\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "PUT",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Pizzaria Auto Atualizada {{runId}}\",\n  \"address\": \"Rua das Palmeiras, 456, Centro\",\n  \"cuisineType\": \"ITALIAN\",\n  \"openingHours\": \"09:00-23:00\",\n  \"userId\": {{ownerUserId}}\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{restaurantId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{restaurantId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "13 - Error Restaurant Not Found",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Missing restaurant returns 404\u0027, function () { pm.response.to.have.status(404); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027ProblemDetail title is Restaurant not found\u0027, function () { pm.expect(body.title).to.eql(\u0027Restaurant not found\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{missingId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{missingId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "14 - Error Menu Item Invalid Price",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Invalid menu item returns 400\u0027, function () { pm.response.to.have.status(400); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027ProblemDetail title is Validation error\u0027, function () { pm.expect(body.title).to.eql(\u0027Validation error\u0027); });",
+                                                                   "pm.test(\u0027Errors contains price\u0027, function () { pm.expect(body.errors).to.have.property(\u0027price\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Pizza Invalida\",\n  \"description\": \"Preco invalido\",\n  \"price\": 0,\n  \"availableOnlyOnRestaurant\": false,\n  \"photoPath\": \"images/invalid.png\"\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{restaurantId}}/menu-items",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{restaurantId}}",
+                                                              "menu-items"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "15 - Error Menu Item Restaurant Not Found",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Missing restaurant for menu item returns 404\u0027, function () { pm.response.to.have.status(404); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027ProblemDetail title is Restaurant not found\u0027, function () { pm.expect(body.title).to.eql(\u0027Restaurant not found\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Pizza Sem Restaurante\",\n  \"description\": \"Restaurante inexistente\",\n  \"price\": 35.90,\n  \"availableOnlyOnRestaurant\": false,\n  \"photoPath\": \"images/missing-restaurant.png\"\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{missingId}}/menu-items",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{missingId}}",
+                                                              "menu-items"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "16 - Create Menu Item",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Menu item created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.collectionVariables.set(\u0027menuItemId\u0027, body.id);",
+                                                                   "pm.test(\u0027Menu item belongs to restaurant\u0027, function () { pm.expect(body.restaurantId).to.eql(Number(pm.collectionVariables.get(\u0027restaurantId\u0027))); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Pizza Margherita {{runId}}\",\n  \"description\": \"Molho de tomate, mussarela e manjericao\",\n  \"price\": 45.90,\n  \"availableOnlyOnRestaurant\": false,\n  \"photoPath\": \"images/pizza-margherita.png\"\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{restaurantId}}/menu-items",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{restaurantId}}",
+                                                              "menu-items"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "17 - List Menu Items By Restaurant",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027List menu items returns 200\u0027, function () { pm.response.to.have.status(200); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027Response is an array\u0027, function () { pm.expect(body).to.be.an(\u0027array\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{restaurantId}}/menu-items",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{restaurantId}}",
+                                                              "menu-items"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "18 - Get Menu Item By Id",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Get menu item returns 200\u0027, function () { pm.response.to.have.status(200); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027Menu item id matches\u0027, function () { pm.expect(body.id).to.eql(Number(pm.collectionVariables.get(\u0027menuItemId\u0027))); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/menu-items/{{menuItemId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "menu-items",
+                                                              "{{menuItemId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "19 - Update Menu Item",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Update menu item returns 200\u0027, function () { pm.response.to.have.status(200); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027Menu item name was updated\u0027, function () { pm.expect(body.name).to.include(\u0027Atualizada\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "PUT",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Pizza Margherita Atualizada {{runId}}\",\n  \"description\": \"Molho de tomate, mussarela, manjericao e azeite\",\n  \"price\": 49.90,\n  \"availableOnlyOnRestaurant\": true,\n  \"photoPath\": \"images/pizza-margherita-updated.png\"\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/menu-items/{{menuItemId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "menu-items",
+                                                              "{{menuItemId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "20 - Error Menu Item Not Found",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Missing menu item returns 404\u0027, function () { pm.response.to.have.status(404); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027ProblemDetail title is Menu item not found\u0027, function () { pm.expect(body.title).to.eql(\u0027Menu item not found\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/menu-items/{{missingId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "menu-items",
+                                                              "{{missingId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "21 - Cascade Setup Restaurant",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Cascade restaurant created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "pm.collectionVariables.set(\u0027cascadeRestaurantId\u0027, pm.response.json().id);"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Cascade Restaurant {{runId}}\",\n  \"address\": \"Rua Cascade, 100, Centro\",\n  \"cuisineType\": \"BRAZILIAN\",\n  \"openingHours\": \"08:00-22:00\",\n  \"userId\": {{ownerUserId}}\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "22 - Cascade Setup Menu Item",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Cascade menu item created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "pm.collectionVariables.set(\u0027cascadeMenuItemId\u0027, pm.response.json().id);"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Cascade Item {{runId}}\",\n  \"description\": \"Item para teste de cascade por restaurante\",\n  \"price\": 29.90,\n  \"availableOnlyOnRestaurant\": false,\n  \"photoPath\": \"images/cascade-item.png\"\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{cascadeRestaurantId}}/menu-items",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{cascadeRestaurantId}}",
+                                                              "menu-items"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "23 - Cascade Delete Restaurant",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Delete restaurant returns 200\u0027, function () { pm.response.to.have.status(200); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "DELETE",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{cascadeRestaurantId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{cascadeRestaurantId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "24 - Cascade Assert Menu Item Deleted",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Menu item deleted by restaurant cascade returns 404\u0027, function () { pm.response.to.have.status(404); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027ProblemDetail title is Menu item not found\u0027, function () { pm.expect(body.title).to.eql(\u0027Menu item not found\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/menu-items/{{cascadeMenuItemId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "menu-items",
+                                                              "{{cascadeMenuItemId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "25 - Cascade Setup User",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Cascade user created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "pm.collectionVariables.set(\u0027cascadeUserId\u0027, pm.response.json().id);"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Cascade Owner {{runId}}\",\n  \"email\": \"{{cascadeEmail}}\",\n  \"login\": \"cascade{{runId}}\",\n  \"password\": \"Senha@123\",\n  \"roleId\": {{ownerRoleId}}\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/users",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "users"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "26 - Cascade User Restaurant",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Cascade user restaurant created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "pm.collectionVariables.set(\u0027cascadeUserRestaurantId\u0027, pm.response.json().id);"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Cascade User Restaurant {{runId}}\",\n  \"address\": \"Rua Cascade User, 200, Centro\",\n  \"cuisineType\": \"MEXICAN\",\n  \"openingHours\": \"08:00-22:00\",\n  \"userId\": {{cascadeUserId}}\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "27 - Cascade User Menu Item",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Cascade user menu item created\u0027, function () { pm.response.to.have.status(201); });",
+                                                                   "pm.collectionVariables.set(\u0027cascadeUserMenuItemId\u0027, pm.response.json().id);"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "POST",
+                                     "header":  [
+                                                    {
+                                                        "key":  "Content-Type",
+                                                        "value":  "application/json"
+                                                    }
+                                                ],
+                                     "body":  {
+                                                  "mode":  "raw",
+                                                  "raw":  "{\n  \"name\": \"Cascade User Item {{runId}}\",\n  \"description\": \"Item para teste de cascade por usuario\",\n  \"price\": 39.90,\n  \"availableOnlyOnRestaurant\": false,\n  \"photoPath\": \"images/cascade-user-item.png\"\n}"
+                                              },
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{cascadeUserRestaurantId}}/menu-items",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{cascadeUserRestaurantId}}",
+                                                              "menu-items"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "28 - Cascade Delete User",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Delete user returns 200\u0027, function () { pm.response.to.have.status(200); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "DELETE",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/users/{{cascadeUserId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "users",
+                                                              "{{cascadeUserId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "29 - Cascade Assert Restaurant Deleted By User",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Restaurant deleted by user cascade returns 404\u0027, function () { pm.response.to.have.status(404); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027ProblemDetail title is Restaurant not found\u0027, function () { pm.expect(body.title).to.eql(\u0027Restaurant not found\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{cascadeUserRestaurantId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{cascadeUserRestaurantId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "30 - Cascade Assert Menu Item Deleted By User",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Menu item deleted by user cascade returns 404\u0027, function () { pm.response.to.have.status(404); });",
+                                                                   "const body = pm.response.json();",
+                                                                   "pm.test(\u0027ProblemDetail title is Menu item not found\u0027, function () { pm.expect(body.title).to.eql(\u0027Menu item not found\u0027); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/menu-items/{{cascadeUserMenuItemId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "menu-items",
+                                                              "{{cascadeUserMenuItemId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "31 - Cleanup Delete Menu Item",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Delete menu item returns 204\u0027, function () { pm.response.to.have.status(204); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "DELETE",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/menu-items/{{menuItemId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "menu-items",
+                                                              "{{menuItemId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "32 - Cleanup Assert Menu Item Deleted",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Deleted menu item returns 404\u0027, function () { pm.response.to.have.status(404); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "GET",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/menu-items/{{menuItemId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "menu-items",
+                                                              "{{menuItemId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "33 - Cleanup Delete Restaurant",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Delete restaurant returns 200\u0027, function () { pm.response.to.have.status(200); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "DELETE",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/restaurants/{{restaurantId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "restaurants",
+                                                              "{{restaurantId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "34 - Cleanup Delete Owner User",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Delete owner user returns 200\u0027, function () { pm.response.to.have.status(200); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "DELETE",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/users/{{ownerUserId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "users",
+                                                              "{{ownerUserId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "35 - Cleanup Delete Client User",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Delete client user returns 200\u0027, function () { pm.response.to.have.status(200); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "DELETE",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/users/{{clientUserId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "users",
+                                                              "{{clientUserId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 },
+                 {
+                     "name":  "36 - Cleanup Delete CLIENT Role",
+                     "event":  [
+                                   {
+                                       "listen":  "test",
+                                       "script":  {
+                                                      "type":  "text/javascript",
+                                                      "exec":  [
+                                                                   "pm.test(\u0027Delete client role returns 204\u0027, function () { pm.response.to.have.status(204); });"
+                                                               ]
+                                                  }
+                                   }
+                               ],
+                     "request":  {
+                                     "method":  "DELETE",
+                                     "header":  [
+
+                                                ],
+                                     "url":  {
+                                                 "raw":  "{{baseUrl}}/roles/{{clientRoleId}}",
+                                                 "host":  [
+                                                              "{{baseUrl}}"
+                                                          ],
+                                                 "path":  [
+                                                              "roles",
+                                                              "{{clientRoleId}}"
+                                                          ]
+                                             }
+                                 },
+                     "response":  [
+
+                                  ]
+                 }
+             ]
+}
